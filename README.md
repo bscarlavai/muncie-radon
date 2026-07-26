@@ -46,22 +46,32 @@ at all.
 Do not `wrangler logout`. Use a named auth profile bound to this directory:
 
 ```bash
-npx wrangler auth create muncie-radon      # opens the browser; log in as the APPS account
-npx wrangler auth activate muncie-radon .  # binds that profile to this directory
+npx wrangler auth create lavailabs      # opens the browser; log in as the APPS account
+npx wrangler auth activate lavailabs .  # binds that profile to this directory
 ```
 
-After that, every wrangler command run from this repo uses the apps account, and
-every command run from any other repo keeps using the personal login. Verify:
+**Name the profile after the account, not the project.** Wrangler stores a
+directory-to-profile map in `~/Library/Preferences/.wrangler/profiles/directory-bindings.json`,
+so one profile binds to many directories. The next app under this account runs
+`npx wrangler auth activate lavailabs .` in its own directory and reuses this
+same login. A per-project profile name would mean a redundant OAuth grant per
+repo for the same account.
+
+The personal account stays as `default`, which is the fallback for any directory
+with no binding. That is why every other repo keeps working untouched, and why
+renaming `default` would be a bad idea.
+
+After that, verify:
 
 ```bash
-npx wrangler whoami        # from this directory: apps account
-npx wrangler auth list     # shows the profile and its bound directory
+npx wrangler whoami        # from this directory: bret@lavailabs.com
+npx wrangler auth list     # profile plus its bound directories
 ```
 
-Then paste the account id from `whoami` into `account_id` in `wrangler.toml`.
-That pin is a guard, not a convenience: it makes a wrong-account session fail
-loudly instead of silently creating a second `muncie-radon` project somewhere
-you will not think to look.
+`account_id` in `wrangler.toml` is already pinned to this account. That pin is a
+guard, not a convenience: it makes a wrong-account session fail loudly instead of
+silently creating a second `muncie-radon` project somewhere you will not think to
+look.
 
 `npx wrangler auth` is marked experimental in wrangler 4.114. The fallback, if it
 misbehaves, is a scoped API token in the environment instead:

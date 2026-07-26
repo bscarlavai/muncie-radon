@@ -8,7 +8,7 @@ pages_build_output_dir = "dist"
 # creating a second muncie-radon project in the wrong place.
 #
 # Get it from `wrangler whoami` while authenticated to the apps account.
-account_id = "REPLACE_WITH_ACCOUNT_ID"
+account_id = "d42538cebc7d337a0c0769a11f261ea5"
 
 # D1 is the receipts database. Every lead and every call lands here, and it is
 # what turns "the site ranks" into "here are 47 inbound leads with timestamps"
@@ -20,7 +20,7 @@ account_id = "REPLACE_WITH_ACCOUNT_ID"
 [[d1_databases]]
 binding = "DB"
 database_name = "muncie-radon"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "9e353747-a72f-426d-b019-fca286c01c2b"
 
 [vars]
 BRAND = "Muncie Radon"
@@ -43,7 +43,7 @@ BRAND = "Muncie Radon"
 [[env.preview.d1_databases]]
 binding = "DB"
 database_name = "muncie-radon"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "9e353747-a72f-426d-b019-fca286c01c2b"
 
 # Secrets are NOT set here. Set them in the Pages dashboard, or:
 #   wrangler pages secret put RESEND_API_KEY
