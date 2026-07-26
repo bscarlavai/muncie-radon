@@ -89,21 +89,19 @@ if (/analyticsToken:\s*''/.test(config)) {
 }
 
 /* ---- 5. Deploy target is filled in ----------------------------------------- */
-// This site deploys to the apps account, not the personal one. An unreplaced
-// account_id is how a project ends up created in the wrong account, and an
-// unreplaced database_id means the deploy fails outright.
+// An unreplaced database_id means the DB binding never resolves and lead capture
+// fails. It appears twice, because Pages does not inherit bindings into named
+// environments, and filling in one and missing the other is the likely mistake.
+// The wrong-account guard is not here: it needs a network call, so it lives in
+// scripts/check-account.mjs and runs on deploy rather than on every build.
 const wrangler = readFileSync('wrangler.toml', 'utf8');
-for (const [placeholder, consequence] of [
-  ['REPLACE_WITH_ACCOUNT_ID', 'wrangler cannot tell which Cloudflare account to deploy to'],
-  ['REPLACE_WITH_D1_DATABASE_ID', 'the DB binding will not resolve and lead capture will fail'],
-]) {
-  const n = wrangler.split(placeholder).length - 1;
-  if (n) {
-    warnings.push(
-      `wrangler.toml still has ${placeholder} in ${n} place(s); ${consequence}. ` +
-        `Note the preview environment keeps its own copy of the database id.`,
-    );
-  }
+const stale = wrangler.split('REPLACE_WITH_D1_DATABASE_ID').length - 1;
+if (stale) {
+  warnings.push(
+    `wrangler.toml still has REPLACE_WITH_D1_DATABASE_ID in ${stale} place(s); ` +
+      `the DB binding will not resolve and lead capture will fail. ` +
+      `Both production and [env.preview] need the id.`,
+  );
 }
 
 /* ---- Report ---------------------------------------------------------------- */

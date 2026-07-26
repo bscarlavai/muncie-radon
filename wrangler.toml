@@ -2,13 +2,11 @@ name = "muncie-radon"
 compatibility_date = "2026-07-01"
 pages_build_output_dir = "dist"
 
-# This repo deploys to a DIFFERENT Cloudflare account than the personal one that
-# holds the older projects. Pinning account_id here means a wrangler session
-# authenticated against the wrong account fails loudly instead of quietly
-# creating a second muncie-radon project in the wrong place.
-#
-# Get it from `wrangler whoami` while authenticated to the apps account.
-account_id = "d42538cebc7d337a0c0769a11f261ea5"
+# NOTE: account_id cannot go here. Pages rejects the field outright:
+#   "Configuration file for Pages projects does not support account_id"
+# This repo deploys to a different Cloudflare account than the personal one
+# holding the older projects, so the wrong-account guard lives in
+# scripts/check-account.mjs and runs on `npm run deploy` instead.
 
 # D1 is the receipts database. Every lead and every call lands here, and it is
 # what turns "the site ranks" into "here are 47 inbound leads with timestamps"

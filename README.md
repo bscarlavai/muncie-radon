@@ -144,11 +144,30 @@ That is direct upload: no GitHub remote required, and it is the fastest path to
 a live URL. The tradeoff is that deploys happen from your machine, so whatever
 is in `dist/` at that moment is what ships.
 
-To move to git-connected builds later (the pattern the other projects use),
-push the repo to GitHub, connect it in the Pages dashboard, and set the build
-command to `npm run build` with output directory `dist`. Cloudflare then builds
-on push. `npm run audit` runs as part of `npm run build`, so the house rules
-gate the deploy either way.
+`npm run deploy` runs the wrong-account guard first, then builds, then uploads.
+Use it rather than calling `wrangler pages deploy` directly.
+
+**Git-connected builds.** Repo is `git@github.com:bscarlavai/muncie-radon.git`.
+Dashboard settings:
+
+| Field | Value |
+|---|---|
+| Production branch | `main` |
+| Framework preset | Astro |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Root directory | blank |
+
+`.nvmrc` pins Node 22 because Astro 7 requires `>=22.12.0` and the Cloudflare
+build image default has lagged that floor. Without the pin the remote build can
+fail on a version error that looks nothing like a version error.
+
+Cloudflare reads `wrangler.toml` during Pages builds, so the D1 bindings come
+from the repo either way. Secrets do not: they are per-project and must be set
+against whichever project actually serves the domain.
+
+`npm run audit` runs as part of `npm run build`, so the house rules gate the
+deploy on both paths.
 
 **Custom domain.** The domain was registered in this same account, so the zone
 already exists and no nameserver change is needed.
