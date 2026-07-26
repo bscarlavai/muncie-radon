@@ -63,8 +63,11 @@ const steps = [
         <circle cx="3" cy="3" r="1.1" fill="#8a7a63" opacity="0.5" />
         <circle cx="10" cy="9" r="1.1" fill="#8a7a63" opacity="0.4" />
       </pattern>
-      <marker id="gas" viewBox="0 0 10 10" refX="5" refY="8" markerWidth="5" markerHeight="5" orient="auto">
-        <path d="M5 0 L9.5 9 L0.5 9 Z" fill="#b8500a" opacity="0.75" />
+      <!-- Arrowhead must point along +X in marker space. orient="auto" rotates
+           it to match the line direction from there; a triangle drawn pointing
+           up gets rotated 90 degrees off and reads as a flag on a pole. -->
+      <marker id="gas" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto">
+        <path d="M0 0.8 L10 5 L0 9.2 Z" fill="#b8500a" />
       </marker>
     </defs>
 
@@ -126,7 +129,8 @@ const steps = [
 
     <!-- Numbered markers, keyed to the HTML legend -->
     <g font-family="system-ui, sans-serif" font-size="12" font-weight="700" text-anchor="middle">
-      <circle cx="52" cy="252" r="11" fill="#0d1f31" /><text x="52" y="256" fill="#fff">1</text>
+      <!-- Offset left of the x=52 gas arrow; centred on it, the badge hides it. -->
+      <circle cx="24" cy="258" r="11" fill="#0d1f31" /><text x="24" y="262" fill="#fff">1</text>
       <circle cx="152" cy="228" r="11" fill="#0d1f31" /><text x="152" y="232" fill="#fff">2</text>
       <circle cx="196" cy="196" r="11" fill="#0d1f31" /><text x="196" y="200" fill="#fff">3</text>
       <circle cx="240" cy="101" r="11" fill="#0d1f31" /><text x="240" y="105" fill="#fff">4</text>
