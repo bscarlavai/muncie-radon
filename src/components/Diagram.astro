@@ -1,0 +1,124 @@
+---
+/**
+ * Shell for the technical diagrams.
+ *
+ * Deliberate split: the drawing is SVG, the labels are HTML. Baking <text>
+ * into the SVG means a 400-wide viewBox scaled to a 340px phone renders 12px
+ * type at about 7px. Numbered markers in the drawing paired with an HTML
+ * ordered list stays legible at any width, is selectable, is translatable, and
+ * reads correctly in a screen reader.
+ */
+export interface DiagramStep {
+  /** Matches the numbered marker in the SVG */
+  n: number;
+  label: string;
+  /** Inline HTML allowed */
+  body: string;
+}
+
+interface Props {
+  title: string;
+  /** Sentence describing the whole drawing, for screen readers */
+  alt: string;
+  steps: DiagramStep[];
+  caption?: string;
+}
+
+const { title, alt, steps, caption } = Astro.props;
+---
+
+<figure class="diagram">
+  <figcaption class="dg-title">{title}</figcaption>
+
+  <div class="dg-canvas" role="img" aria-label={alt}>
+    <slot />
+  </div>
+
+  <ol class="dg-legend">
+    {
+      steps.map((step) => (
+        <li>
+          <span class="dg-num" aria-hidden="true">{step.n}</span>
+          <span>
+            <strong>{step.label}</strong> <span set:html={step.body} />
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+
+  {caption && <p class="dg-caption">{caption}</p>}
+</figure>
+
+<style>
+  .diagram {
+    margin: var(--s-6) 0;
+    padding: var(--s-5);
+    background: var(--card-bg);
+    border: 1px solid var(--subtle-border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .dg-title {
+    margin-bottom: var(--s-4);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+  }
+
+  .dg-canvas {
+    background: var(--blue-50);
+    border-radius: var(--r-md);
+    padding: var(--s-4);
+  }
+  .dg-canvas :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .dg-legend {
+    display: grid;
+    gap: var(--s-3);
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    list-style: none;
+    margin: var(--s-5) 0 0;
+    padding: 0;
+    max-width: none;
+  }
+
+  .dg-legend li {
+    display: flex;
+    gap: var(--s-3);
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .dg-num {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    border-radius: var(--r-full);
+    background: var(--navy-800);
+    color: var(--white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dg-caption {
+    margin: var(--s-4) 0 0;
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--subtle-border);
+    font-size: 0.875rem;
+    color: var(--muted-text);
+    max-width: none;
+  }
+</style>

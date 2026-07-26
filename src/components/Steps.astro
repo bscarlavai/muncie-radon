@@ -1,0 +1,66 @@
+---
+/** Numbered process list: used for "how it works" on home + service pages. */
+interface Props {
+  steps: { title: string; body: string }[];
+}
+const { steps } = Astro.props;
+---
+
+<ol class="steps">
+  {
+    steps.map((step, index) => (
+      <li>
+        <span class="step-num" aria-hidden="true">{index + 1}</span>
+        <div>
+          <h3 class="step-title">{step.title}</h3>
+          <p class="step-body" set:html={step.body} />
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .steps {
+    list-style: none;
+    counter-reset: none;
+    margin: var(--s-5) 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+    max-width: none;
+  }
+
+  li {
+    display: flex;
+    gap: var(--s-4);
+    margin: 0;
+    padding: var(--s-4);
+    background: var(--card-bg);
+    border: 1px solid var(--subtle-border);
+    border-radius: var(--r-md);
+  }
+
+  .step-num {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--r-full);
+    background: var(--navy-800);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 0.9375rem;
+  }
+
+  .step-title {
+    margin: 0 0 var(--s-1);
+    font-size: 1.0625rem;
+  }
+
+  .step-body {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+</style>

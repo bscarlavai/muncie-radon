@@ -1,0 +1,101 @@
+---
+import { site } from '../site.config';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PhoneLink from '../components/PhoneLink.astro';
+import ServiceGrid from '../components/ServiceGrid.astro';
+import { Icon } from 'astro-icon/components';
+
+const title = `Thanks, we got your request | ${site.brand}`;
+const description = `Your radon quote request reached us. Here is what happens next.`;
+---
+
+<BaseLayout title={title} description={description} noindex>
+  <section class="section thanks">
+    <div class="wrap-narrow text-center">
+      <span class="thanks-mark" aria-hidden="true">
+        <Icon name="lucide:circle-check-big" size={38} />
+      </span>
+      <h1>Got it. Thanks.</h1>
+      <p class="lead center-measure">
+        Your request reached us directly. We follow up during {site.hours}, and if you included a
+        deadline we will prioritize accordingly.
+      </p>
+
+      <div class="thanks-cta">
+        <p class="thanks-urgent">In a hurry, or working against a closing date?</p>
+        <PhoneLink placement="thanks" variant="button" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="wrap-narrow">
+      <h2 class="mt-0">While you wait</h2>
+      <p>
+        Two things worth doing before we talk, both free and both make the conversation faster.
+      </p>
+      <ul>
+        <li>
+          <strong>Find your test result if you have one.</strong> The measured number and the test
+          method are the two things that determine most of the answer.
+        </li>
+        <li>
+          <strong>Check whether you already have a passive rough-in.</strong> Look for a capped
+          white PVC pipe running from below the slab up through the house and out the roof, often
+          with a junction box near it in the attic. If you find one, mitigation gets substantially
+          cheaper, because activating an existing pipe is a fraction of a retrofit.
+        </li>
+      </ul>
+      <p class="mb-0">
+        If you already have a system and are not sure it works, the manometer test takes five
+        seconds and is described on the <a href="/services/system-repair/">system repair page</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2 class="mt-0">Read up while you wait</h2>
+      <ServiceGrid />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .thanks {
+    padding-block: var(--s-8) var(--s-7);
+    background: linear-gradient(180deg, var(--green-100) 0%, var(--white) 100%);
+  }
+
+  .thanks-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    margin-bottom: var(--s-5);
+    border-radius: var(--r-full);
+    background: var(--white);
+    color: var(--green-700);
+    box-shadow: var(--shadow-md);
+  }
+
+  .thanks h1 {
+    margin-bottom: var(--s-4);
+  }
+
+  .thanks-cta {
+    margin-top: var(--s-6);
+    padding: var(--s-5);
+    background: var(--white);
+    border: 1px solid var(--subtle-border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .thanks-urgent {
+    margin-bottom: var(--s-4);
+    font-weight: 650;
+    color: var(--primary-text);
+    max-width: none;
+  }
+</style>

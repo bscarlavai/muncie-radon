@@ -1,0 +1,164 @@
+---
+import { getCollection } from 'astro:content';
+import { site } from '../../site.config';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { Icon } from 'astro-icon/components';
+
+const entries = await getCollection('areas');
+
+// Pair each config area with its content entry so the card can show the page's
+// own intro rather than a second description maintained in two places.
+const areas = site.areas.map((area) => ({
+  ...area,
+  entry: entries.find((e) => e.id === area.slug),
+}));
+
+const title = `Radon Service Areas | Muncie, Anderson, Yorktown & East Central IN`;
+const description = `Radon testing and mitigation across Delaware County and Madison County: Muncie, Anderson, Yorktown, Albany, Daleville, Eaton, Gaston and Selma. Same pricing everywhere.`;
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHero
+    h1={`Radon Service Areas in ${site.region}`}
+    intro={`We cover ${site.city} and the surrounding towns at the same pricing, with no travel surcharge and no separate minimum outside ${site.county}. Every town below has EPA Zone 1 geology underneath it.`}
+    crumbs={[{ label: 'Service Areas' }]}
+    placement="hero:areas-index"
+    formHref="/contact/"
+  />
+
+  <section class="section">
+    <div class="wrap">
+      <h2 class="mt-0">Towns with a dedicated page</h2>
+      <p class="section-intro">
+        These four get their own page because each has a genuinely different radon situation, not
+        because we needed more pages.
+      </p>
+
+      <div class="area-cards">
+        {
+          areas.map((area) => (
+            <a href={`/service-areas/${area.slug}/`} class="area-card">
+              <div class="ac-head">
+                <h3>
+                  Radon Mitigation in {area.name}, {site.stateAbbr}
+                </h3>
+                <span class="ac-meta">
+                  {area.county} · {area.driveTime} from {site.city}
+                </span>
+              </div>
+              <p class="ac-intro">{area.entry?.data.intro}</p>
+              <span class="ac-more" aria-hidden="true">
+                Read more
+                <Icon name="lucide:arrow-right" size={16} />
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="wrap-narrow">
+      <h2 class="mt-0">Also serving</h2>
+      <p>
+        {site.additionalTowns.join(', ')} and the unincorporated parts of {site.county}. These do
+        not have their own page yet, and we would rather leave them off than publish four
+        near-identical pages with the town name swapped. Same pricing, same free estimate, same
+        phone number.
+      </p>
+      <ul class="town-list">
+        {site.additionalTowns.map((town) => <li>{town}</li>)}
+      </ul>
+      <p class="mb-0">
+        Not sure whether you are in range? Call {site.phone.display} and ask. If you are outside
+        what we can reasonably cover, we will say so rather than take the drive and bill you for it.
+      </p>
+    </div>
+  </section>
+
+  <CtaBand placement="footer-cta:areas-index" formHref="/contact/" />
+</BaseLayout>
+
+<style>
+  .section-intro {
+    max-width: 70ch;
+  }
+
+  .area-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--s-4);
+    margin-top: var(--s-5);
+  }
+
+  .area-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--s-5);
+    background: var(--card-bg);
+    border: 1px solid var(--subtle-border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: var(--body-text);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+  .area-card:hover {
+    border-color: var(--blue-500);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    color: var(--body-text);
+  }
+
+  .ac-head h3 {
+    margin: 0 0 var(--s-1);
+    font-size: 1.0625rem;
+    color: var(--link);
+  }
+
+  .ac-meta {
+    display: block;
+    margin-bottom: var(--s-3);
+    font-size: 0.8125rem;
+    color: var(--muted-text);
+  }
+
+  .ac-intro {
+    margin: 0 0 var(--s-4);
+    font-size: 0.9375rem;
+    max-width: none;
+  }
+
+  .ac-more {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin-top: auto;
+    font-size: 0.9375rem;
+    font-weight: 650;
+    color: var(--link);
+  }
+
+  .town-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    list-style: none;
+    margin: var(--s-4) 0 var(--s-5);
+    padding: 0;
+    max-width: none;
+  }
+  .town-list li {
+    margin: 0;
+    padding: var(--s-2) var(--s-4);
+    background: var(--white);
+    border: 1px solid var(--subtle-border);
+    border-radius: var(--r-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-700);
+  }
+</style>

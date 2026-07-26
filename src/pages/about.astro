@@ -1,0 +1,154 @@
+---
+import { site } from '../site.config';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Callout from '../components/Callout.astro';
+
+const title = `About Muncie Radon | How We Work & Who Does the Work`;
+const description = `Muncie Radon connects Delaware County property owners with IDOH-certified radon professionals. How the free estimate works and why we publish our pricing.`;
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHero
+    h1={`About ${site.brand}`}
+    intro={`${site.brand} is a lead referral service for radon testing and mitigation in ${site.city} and ${site.region}. We connect property owners with ${site.localFacts.certifier}-certified radon professionals, and we publish what things cost so you can decide whether to call at all.`}
+    crumbs={[{ label: 'About' }]}
+    placement="hero:about"
+    formHref="/contact/"
+  />
+
+  <div class="wrap-narrow prose about-body">
+    <h2>What we are, stated plainly</h2>
+    <p>
+      Most local service websites are vague about this, so here it is up front. <strong
+        >{site.brand} is a lead generation brand.</strong
+      > When you call the number on this site or send the quote form, you reach us, and we route your
+      job to an independent radon professional who holds {site.localFacts.certifier} certification and
+      works in {site.county}.
+    </p>
+    <p>
+      {site.state} requires certification from the {site.localFacts.certifierFull} to provide radon
+      testing and mitigation services to the public. That certification belongs to the professional
+      doing the work on your property, not to this website, and we verify it before we route anyone
+      to you.
+    </p>
+
+    <Callout tone="info" title="Why we say this out loud">
+      <p class="mb-0">
+        Plenty of sites in this category are structured exactly like this one and describe themselves
+        as though they own trucks. We would rather tell you and be trusted on the parts that follow.
+        If working through a referral service is not what you want, the alternative is straightforward:
+        search the {site.localFacts.certifierFull} certified professional list directly and call
+        someone from it. That is a completely reasonable thing to do.
+      </p>
+    </Callout>
+
+    <h2>How the free estimate works</h2>
+    <p>
+      A radon quote does not require a sales appointment to produce a range. It requires a sales
+      appointment to produce a <em>final number</em>, which is a different thing, and conflating the
+      two is how this industry wastes people's evenings.
+    </p>
+    <ol>
+      <li>
+        <strong>You call or send the form.</strong> Two required fields. If you have a test result
+        already, that alone tells us most of what matters.
+      </li>
+      <li>
+        <strong>We ask about the house.</strong> Foundation type, footprint, whether there is an
+        existing system, and whether you are working against a deadline.
+      </li>
+      <li>
+        <strong>You get a range for your situation</strong>, not the generic one on this page.
+        Usually on that first call.
+      </li>
+      <li>
+        <strong>If it makes sense to proceed</strong>, an on-site assessment produces the fixed
+        quote. Ask for it in writing, from us or from anyone else you call.
+      </li>
+    </ol>
+    <p>
+      The estimate is free whether or not you hire anyone, including in the cases where the honest
+      answer is that your number does not justify the spend right now.
+    </p>
+
+    <h2>Why we publish pricing</h2>
+    <p>
+      Search radon mitigation for this city and you will find directories, a national brand's
+      auto-generated city page, and a handful of companies based an hour or more away. Almost none of
+      them will tell you a number without a form.
+    </p>
+    <p>
+      We publish <strong>{site.priceRange}</strong> for a typical single-family system because the
+      alternative wastes everyone's time. If that range does not fit your budget, you found that out
+      in ten seconds instead of after an appointment. If it does, you start the conversation already
+      knowing roughly where it lands, which is a better conversation.
+    </p>
+    <p>
+      The same principle drives the rest of the site. Every question we get asked is answered on the
+      page rather than held back as a reason to call: what a system costs, whether a 3.3 pCi/L
+      reading is worth fixing, what happens when a radon test fails mid-transaction, and how to tell
+      if the system you already have has quietly stopped working.
+    </p>
+
+    <h2>What we will not tell you</h2>
+    <p>
+      A short list, because the omissions on a site like this are as informative as the claims:
+    </p>
+    <ul>
+      <li>
+        <strong>We do not claim years in business, a team, or a review count.</strong> This is a new
+        brand. Inventing history would be the easiest lie on the internet and the first one worth
+        catching.
+      </li>
+      <li>
+        <strong>We do not publish testimonials we did not receive.</strong> When there are real ones,
+        they will go up with real names attached.
+      </li>
+      <li>
+        <strong>We do not use the scarier radon research to sell systems.</strong> The lung cancer
+        link is well established and is the reason to act. Claims tying radon to other conditions are
+        far less settled, and leaning on them would be using your fear against you.
+      </li>
+      <li>
+        <strong>We do not pretend every reading needs mitigation.</strong> Below 2.0 pCi/L, retest in
+        two years and spend your money elsewhere.
+      </li>
+    </ul>
+
+    <h2>Why {site.city}</h2>
+    <p>
+      {site.county} is EPA Zone 1, the highest radon risk designation the agency assigns, and the
+      average {site.city} home tests at about {site.localFacts.avgLevel} pCi/L, which is exactly the
+      level at which the EPA says to take action. That combination means roughly half the housing
+      stock in this county is sitting above the action level.
+    </p>
+    <p>
+      What the county does not have is a dedicated local radon resource. The search results are
+      directories and out-of-town companies. This site exists to be the {site.city}-specific
+      answer: local pricing, local geology, local transaction practice, and a phone number that
+      reaches a person.
+    </p>
+
+    <h2>Questions we are happy to answer on the phone</h2>
+    <p>
+      Including the ones that do not lead to a sale. Whether your existing system is working, whether
+      your inspection report actually says what the agent said it says, whether a borderline reading
+      is worth acting on, and what a reasonable quote from anyone looks like. Call {
+        site.phone.display
+      } or use the <a href="/contact/">contact page</a>.
+    </p>
+  </div>
+
+  <CtaBand placement="footer-cta:about" formHref="/contact/" />
+</BaseLayout>
+
+<style>
+  .about-body {
+    padding-block: var(--s-7);
+  }
+  .about-body h2:first-child {
+    margin-top: 0;
+  }
+</style>

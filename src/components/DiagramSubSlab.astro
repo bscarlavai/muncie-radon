@@ -1,0 +1,138 @@
+---
+/**
+ * Sub-slab depressurization, in cross-section. The single most useful asset on
+ * the mitigation page: it answers "what is this thing you want to install on my
+ * house" faster than any amount of prose.
+ *
+ * Geometry notes for anyone editing: grade sits at y=210, the slab band is
+ * 204-214, the roof peak is at y=48, and the stack runs at x=196 from the
+ * suction pit up through the roof. Marker positions are keyed to the legend
+ * numbers in the parent Diagram component; renumbering one means renumbering
+ * both.
+ */
+import Diagram from './Diagram.astro';
+
+const steps = [
+  {
+    n: 1,
+    label: 'Soil gas.',
+    body: 'Radon from decaying uranium migrates up through permeable glacial till toward the foundation, which is the lowest-pressure thing above it.',
+  },
+  {
+    n: 2,
+    label: 'Suction pit.',
+    body: 'A single core hole through the slab, with a void excavated in the aggregate beneath so the fan draws from a plenum rather than a straw.',
+  },
+  {
+    n: 3,
+    label: 'Sealed pipe.',
+    body: 'Schedule 40 PVC, sealed at every joint and pitched so condensate drains back toward the pit.',
+  },
+  {
+    n: 4,
+    label: 'Fan, outside living space.',
+    body: 'Mounted in the attic or on an exterior wall. Everything downstream of the fan is under pressure, so a leak there would push radon <em>into</em> the house. That is what the placement rule prevents.',
+  },
+  {
+    n: 5,
+    label: 'Discharge above the roofline.',
+    body: 'Terminated above the roof and away from windows so nothing re-enters.',
+  },
+  {
+    n: 6,
+    label: 'Sealed sump and joints.',
+    body: 'An airtight sump lid and sealed floor-to-wall joints. Sealing is not the mitigation, the fan is, but an open sump short-circuits a correctly sized system.',
+  },
+  {
+    n: 7,
+    label: 'Manometer.',
+    body: 'The U-tube gauge. Uneven liquid means the system is pulling. Level liquid means it is not.',
+  },
+];
+---
+
+<Diagram
+  title="How a sub-slab system works"
+  alt="Cross-section of a house showing radon gas rising from soil into a suction pit beneath the basement slab, drawn up a sealed pipe through a fan in the attic, and discharged above the roofline."
+  steps={steps}
+  caption="Not to scale. Basement and slab-on-grade homes both use this approach; crawl spaces need a sub-membrane system instead."
+>
+  <svg viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <pattern id="soil" width="14" height="14" patternUnits="userSpaceOnUse">
+        <circle cx="3" cy="3" r="1.1" fill="#8a7a63" opacity="0.5" />
+        <circle cx="10" cy="9" r="1.1" fill="#8a7a63" opacity="0.4" />
+      </pattern>
+      <marker id="gas" viewBox="0 0 10 10" refX="5" refY="8" markerWidth="5" markerHeight="5" orient="auto">
+        <path d="M5 0 L9.5 9 L0.5 9 Z" fill="#b8500a" opacity="0.75" />
+      </marker>
+    </defs>
+
+    <!-- Soil -->
+    <rect x="0" y="210" width="420" height="90" fill="#efe6d8" />
+    <rect x="0" y="210" width="420" height="90" fill="url(#soil)" />
+    <line x1="0" y1="210" x2="420" y2="210" stroke="#8a7a63" stroke-width="1.5" />
+
+    <!-- House shell -->
+    <path d="M78 130 L196 48 L314 130" fill="none" stroke="#12293f" stroke-width="3"
+      stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M96 122 V210 H296 V122" fill="#ffffff" stroke="#12293f" stroke-width="3"
+      stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Attic floor, so "outside living space" is legible -->
+    <line x1="96" y1="130" x2="296" y2="130" stroke="#12293f" stroke-width="1.5" opacity="0.35" />
+
+    <!-- Slab -->
+    <rect x="96" y="204" width="200" height="10" fill="#cdd6df" stroke="#41505f" stroke-width="1.2" />
+
+    <!-- Aggregate void beneath the slab -->
+    <ellipse cx="196" cy="228" rx="40" ry="13" fill="#ffffff" opacity="0.85" stroke="#8a7a63"
+      stroke-width="1.2" stroke-dasharray="3 3" />
+
+    <!-- Soil gas arrows converging on the pit -->
+    <g stroke="#b8500a" stroke-width="2" opacity="0.75" marker-end="url(#gas)">
+      <line x1="120" y1="282" x2="150" y2="248" />
+      <line x1="196" y1="286" x2="196" y2="250" />
+      <line x1="272" y1="282" x2="242" y2="248" />
+      <line x1="52" y1="266" x2="52" y2="238" />
+      <line x1="356" y1="266" x2="356" y2="238" />
+    </g>
+
+    <!-- The system: pit -> pipe -> fan -> discharge -->
+    <path d="M196 228 V40" fill="none" stroke="#1462a0" stroke-width="7" stroke-linecap="round" />
+    <path d="M196 228 V40" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"
+      opacity="0.55" />
+
+    <!-- Fan -->
+    <rect x="176" y="86" width="40" height="30" rx="7" fill="#1462a0" stroke="#0d1f31"
+      stroke-width="2" />
+    <circle cx="196" cy="101" r="8" fill="none" stroke="#ffffff" stroke-width="2" />
+    <path d="M196 101 L201 96" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+
+    <!-- Discharge -->
+    <path d="M186 50 L196 38 L206 50" fill="none" stroke="#1462a0" stroke-width="3.5"
+      stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Sealed sump pit, right side -->
+    <path d="M252 214 V236 H286 V214" fill="#ffffff" stroke="#41505f" stroke-width="2" />
+    <rect x="248" y="207" width="42" height="7" rx="3" fill="#14663f" />
+
+    <!-- Manometer on the pipe -->
+    <g transform="translate(210 160)">
+      <rect x="0" y="0" width="19" height="26" rx="4" fill="#ffffff" stroke="#41505f" stroke-width="1.6" />
+      <path d="M5.5 6 V17 a4 4 0 0 0 8 0 V11" fill="none" stroke="#b8500a" stroke-width="2.6"
+        stroke-linecap="round" />
+    </g>
+
+    <!-- Numbered markers, keyed to the HTML legend -->
+    <g font-family="system-ui, sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+      <circle cx="52" cy="252" r="11" fill="#0d1f31" /><text x="52" y="256" fill="#fff">1</text>
+      <circle cx="152" cy="228" r="11" fill="#0d1f31" /><text x="152" y="232" fill="#fff">2</text>
+      <circle cx="196" cy="196" r="11" fill="#0d1f31" /><text x="196" y="200" fill="#fff">3</text>
+      <circle cx="240" cy="101" r="11" fill="#0d1f31" /><text x="240" y="105" fill="#fff">4</text>
+      <circle cx="196" cy="22" r="11" fill="#0d1f31" /><text x="196" y="26" fill="#fff">5</text>
+      <circle cx="308" cy="220" r="11" fill="#0d1f31" /><text x="308" y="224" fill="#fff">6</text>
+      <circle cx="248" cy="150" r="11" fill="#0d1f31" /><text x="248" y="154" fill="#fff">7</text>
+    </g>
+  </svg>
+</Diagram>

@@ -1,0 +1,61 @@
+---
+/**
+ * Two-column body: long-form content plus a sticky quote form.
+ *
+ * MOBILE ORDER IS THE POINT OF THIS COMPONENT. As three separate grids this
+ * pattern put the form in the second column, which on a single-column phone
+ * layout dropped it below the entire article. On a 2,200-word page that is
+ * thousands of pixels down, and the build spec requires the form to be
+ * reachable within one scroll.
+ *
+ * Below the breakpoint the aside is pulled above the content. The reader has
+ * already had the H1, the answer-first intro, and both CTAs from the page hero,
+ * so the form lands after the answer rather than in front of it.
+ *
+ * DOM order stays content-first, so this is purely a visual reorder.
+ */
+interface Props {
+  /** Extra class on the wrapper, for page-specific padding */
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div class:list={['cwa', className]}>
+  <div class="cwa-main">
+    <slot />
+  </div>
+  <aside class="cwa-aside">
+    <div class="cwa-sticky">
+      <slot name="aside" />
+    </div>
+  </aside>
+</div>
+
+<style>
+  .cwa {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: var(--s-7);
+    align-items: start;
+  }
+
+  .cwa-sticky {
+    position: sticky;
+    top: calc(var(--header-h) + var(--s-4));
+  }
+
+  @media (max-width: 980px) {
+    .cwa {
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+    }
+    /* The fix: form above the article on narrow screens. */
+    .cwa-aside {
+      order: -1;
+    }
+    .cwa-sticky {
+      position: static;
+    }
+  }
+</style>

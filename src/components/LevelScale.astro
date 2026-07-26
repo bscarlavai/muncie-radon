@@ -1,0 +1,130 @@
+---
+/**
+ * "What does my number mean?": the single most-searched question behind a
+ * radon result. Defined once here so the thresholds can never disagree
+ * between the testing page, the mitigation page, and the FAQs.
+ *
+ * Thresholds are EPA's, not ours. 4.0 pCi/L is the action level; 2.0 is EPA's
+ * "consider fixing" line. We don't invent a scarier scale to sell systems.
+ */
+import { site } from '../site.config';
+
+const bands = [
+  {
+    range: 'Under 2.0 pCi/L',
+    label: 'No action needed',
+    tone: 'good',
+    body: `You're below EPA's "consider fixing" line. Retest every two years, and again after any foundation, HVAC, or basement-finishing work.`,
+  },
+  {
+    range: '2.0 – 3.9 pCi/L',
+    label: 'Your call',
+    tone: 'watch',
+    body: `EPA says consider fixing in this band. There's no established safe level of radon, but the risk math in this band is genuinely a judgment call. See the honest answer on our <a href="/services/radon-mitigation/">mitigation page</a>.`,
+  },
+  {
+    range: '4.0 – 9.9 pCi/L',
+    label: 'Fix it',
+    tone: 'act',
+    body: `At or above the EPA action level. This is where the average ${site.city} home lands, and it is the range EPA says to fix.`,
+  },
+  {
+    range: '10.0 pCi/L and up',
+    label: 'Fix it soon',
+    tone: 'urgent',
+    body: `High, and still addressed with the same equipment. A high reading is not harder to mitigate than a borderline one, it just makes the decision obvious.`,
+  },
+];
+---
+
+<div class="levels">
+  {
+    bands.map((band) => (
+      <div class:list={['level', `tone-${band.tone}`]}>
+        <div class="level-head">
+          <p class="level-range">{band.range}</p>
+          <p class="level-label">{band.label}</p>
+        </div>
+        <p class="level-body" set:html={band.body} />
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .levels {
+    display: grid;
+    gap: var(--s-3);
+    margin: var(--s-5) 0;
+  }
+
+  .level {
+    padding: var(--s-4);
+    border-radius: var(--r-md);
+    border: 1px solid var(--subtle-border);
+    border-left: 5px solid;
+    background: var(--card-bg);
+  }
+
+  .level-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-3);
+    margin-bottom: var(--s-2);
+  }
+
+  .level-range {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--primary-text);
+  }
+
+  .level-label {
+    margin: 0;
+    padding: 2px var(--s-3);
+    border-radius: var(--r-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .level-body {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .tone-good {
+    border-left-color: var(--green-700);
+  }
+  .tone-good .level-label {
+    background: var(--green-100);
+    color: var(--green-700);
+  }
+
+  .tone-watch {
+    border-left-color: var(--yellow-700);
+  }
+  .tone-watch .level-label {
+    background: var(--yellow-100);
+    color: var(--yellow-700);
+  }
+
+  .tone-act {
+    border-left-color: var(--amber-600);
+  }
+  .tone-act .level-label {
+    background: var(--amber-100);
+    color: var(--amber-600);
+  }
+
+  .tone-urgent {
+    border-left-color: var(--red-700);
+  }
+  .tone-urgent .level-label {
+    background: var(--red-100);
+    color: var(--red-700);
+  }
+</style>

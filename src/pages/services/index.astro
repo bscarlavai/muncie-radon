@@ -1,0 +1,64 @@
+---
+import { site } from '../../site.config';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import ServiceGrid from '../../components/ServiceGrid.astro';
+import CtaBand from '../../components/CtaBand.astro';
+
+const title = `Radon Services in Muncie, IN | Testing, Mitigation & Repair`;
+const description = `Every radon service for Muncie and Delaware County: testing, mitigation systems, real estate transactions, crawl spaces, fan replacement, and commercial buildings.`;
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHero
+    h1={`Radon Services in ${site.city}, ${site.stateAbbr}`}
+    intro={`Six services covering the situations ${site.county} property owners actually run into, from a homeowner who has never tested to an agent whose closing is eleven days out. Typical single-family mitigation runs ${site.priceRange}.`}
+    crumbs={[{ label: 'Services' }]}
+    placement="hero:services-index"
+    formHref="/contact/"
+  />
+
+  <section class="section">
+    <div class="wrap">
+      <ServiceGrid headingLevel={2} />
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="wrap-narrow">
+      <h2 class="mt-0">Not sure which one you need?</h2>
+      <p>
+        Almost everyone starts in the same place, so here is the short decision tree.
+      </p>
+      <ul>
+        <li>
+          <strong>No test result yet?</strong> Start with <a href="/services/radon-testing/"
+            >radon testing</a
+          >. It is the only input that matters and the cheapest step in the process.
+        </li>
+        <li>
+          <strong>Tested at 4.0 pCi/L or higher?</strong> You need
+          <a href="/services/radon-mitigation/">mitigation</a>, unless you are on a crawl space, in
+          which case <a href="/services/crawl-space-radon/">crawl space radon</a> covers the
+          different approach.
+        </li>
+        <li>
+          <strong>Mid-transaction with a deadline?</strong>
+          <a href="/services/real-estate-radon/">Real estate radon</a> covers timelines, who pays,
+          and how Indiana contingencies work in practice.
+        </li>
+        <li>
+          <strong>Already have a system?</strong> Check the manometer. If both columns of liquid are
+          level, see <a href="/services/system-repair/">system repair</a>.
+        </li>
+        <li>
+          <strong>A building rather than a house?</strong>
+          <a href="/services/commercial-radon/">Commercial and multifamily</a> covers testing
+          protocols and engineered mitigation.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand placement="footer-cta:services-index" formHref="/contact/" />
+</BaseLayout>

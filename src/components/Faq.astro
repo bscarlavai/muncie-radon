@@ -1,0 +1,122 @@
+---
+/**
+ * FAQ list. Renders visible Q&A markup AND emits FAQPage JSON-LD when there
+ * are 3+ entries (per the schema rule in the build spec): one component so
+ * the two can never drift apart.
+ *
+ * Answers accept inline HTML (for internal links); the JSON-LD copy is
+ * stripped to text since Google wants plain answers there.
+ */
+export interface FaqItem {
+  q: string;
+  /** May contain inline HTML */
+  a: string;
+}
+
+interface Props {
+  items: FaqItem[];
+  heading?: string;
+  /** Set false on pages that already emit FAQPage schema elsewhere */
+  emitSchema?: boolean;
+  id?: string;
+}
+
+import { Icon } from 'astro-icon/components';
+
+const { items, heading = 'Frequently asked questions', emitSchema = true, id = 'faq' } = Astro.props;
+
+const stripHtml = (html: string) =>
+  html
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const schema =
+  emitSchema && items.length >= 3
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: items.map((item) => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: { '@type': 'Answer', text: stripHtml(item.a) },
+        })),
+      }
+    : null;
+---
+
+<section class="faq" id={id}>
+  <h2>{heading}</h2>
+  <div class="faq-list">
+    {
+      items.map((item) => (
+        <details class="faq-item">
+          <summary>
+            <span>{item.q}</span>
+            <Icon name="lucide:chevron-down" size={18} class="faq-chevron" />
+          </summary>
+          <div class="faq-answer" set:html={item.a} />
+        </details>
+      ))
+    }
+  </div>
+</section>
+
+{schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />}
+
+<style>
+  .faq {
+    margin-top: var(--s-7);
+  }
+
+  .faq-list {
+    border: 1px solid var(--subtle-border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--card-bg);
+  }
+
+  .faq-item + .faq-item {
+    border-top: 1px solid var(--subtle-border);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    min-height: 56px;
+    padding: var(--s-4) var(--s-5);
+    font-size: 1.0625rem;
+    font-weight: 650;
+    color: var(--primary-text);
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary:hover {
+    background: var(--blue-50);
+  }
+
+  .faq-chevron {
+    flex-shrink: 0;
+    color: var(--gray-500);
+    transition: transform 0.18s ease;
+  }
+  details[open] .faq-chevron {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer {
+    padding: 0 var(--s-5) var(--s-5);
+  }
+  .faq-answer :global(p) {
+    margin-bottom: var(--s-3);
+  }
+  .faq-answer :global(p:last-child),
+  .faq-answer :global(ul:last-child) {
+    margin-bottom: 0;
+  }
+</style>

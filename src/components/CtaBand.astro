@@ -1,0 +1,86 @@
+---
+/**
+ * The dual CTA (call + form) that closes every page. One component so the
+ * offer, the phrasing, and the tracking stay identical sitewide.
+ */
+import { site } from '../site.config';
+import PhoneLink from './PhoneLink.astro';
+
+interface Props {
+  heading?: string;
+  body?: string;
+  /** Identifies this CTA instance in the call-click + lead data */
+  placement: string;
+  /** Anchor the secondary button at a form on the current page instead of /contact/ */
+  formHref?: string;
+  formLabel?: string;
+}
+
+const {
+  heading = `Find out what your ${site.city} home is actually reading`,
+  body = `Free estimate, straight numbers, and a real answer about whether you need a system at all. We serve ${site.city} and the surrounding ${site.region} towns.`,
+  placement,
+  formHref = '/contact/',
+  formLabel = 'Request a free quote',
+} = Astro.props;
+---
+
+<section class="section section-brand cta-band">
+  <div class="wrap cta-inner">
+    <div class="cta-copy">
+      <h2>{heading}</h2>
+      <p>{body}</p>
+    </div>
+    <div class="cta-actions">
+      <PhoneLink placement={placement} variant="button" />
+      <a href={formHref} class="btn btn-ghost-inverse">{formLabel}</a>
+      <p class="cta-hours">{site.hours}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-band {
+    padding-block: var(--s-7);
+  }
+
+  .cta-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-6);
+  }
+
+  .cta-copy {
+    flex: 1 1 380px;
+  }
+  .cta-copy h2 {
+    margin-top: 0;
+    margin-bottom: var(--s-3);
+  }
+  .cta-copy p {
+    margin-bottom: 0;
+  }
+
+  .cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3);
+    flex: 0 1 auto;
+  }
+
+  .cta-hours {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  @media (max-width: 640px) {
+    .cta-actions :global(.btn) {
+      flex: 1 1 100%;
+    }
+  }
+</style>

@@ -1,0 +1,176 @@
+---
+import { site, areaListSentence } from '../site.config';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import PhoneLink from '../components/PhoneLink.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { Icon } from 'astro-icon/components';
+import ContentWithAside from '../components/ContentWithAside.astro';
+
+const title = `Contact Muncie Radon | Free Radon Quotes, Delaware County IN`;
+const description = `Get a free radon testing or mitigation quote in Muncie and Delaware County. Call ${site.phone.display} or send the form. Typical system ${site.priceRange}.`;
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="wrap">
+    <Breadcrumbs crumbs={[{ label: 'Contact' }]} />
+  </div>
+
+  <div class="wrap page-body">
+    <ContentWithAside>
+      <div>
+      <h1>Contact {site.brand}</h1>
+      <p class="lead">
+        Free estimates on every job, including the ones where the answer is that you do not need a
+        system. Call for the fastest answer, or send the form and we will follow up.
+      </p>
+
+      <div class="contact-cards">
+        <div class="contact-card">
+          <span class="cc-icon" aria-hidden="true"><Icon name="lucide:phone" size={20} /></span>
+          <div>
+            <h2>Call</h2>
+            <p class="cc-value"><PhoneLink placement="contact-page" variant="inline" /></p>
+            <p class="cc-note">{site.hours}</p>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <span class="cc-icon" aria-hidden="true"><Icon name="lucide:mail" size={20} /></span>
+          <div>
+            <h2>Email</h2>
+            <p class="cc-value"><a href={`mailto:${site.email}`}>{site.email}</a></p>
+            <p class="cc-note">Best for commercial and multifamily requests</p>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <span class="cc-icon" aria-hidden="true"><Icon name="lucide:map-pin" size={20} /></span>
+          <div>
+            <h2>Service area</h2>
+            <p class="cc-value">{site.city} &amp; {site.region}</p>
+            <p class="cc-note">
+              {areaListSentence()}, plus {site.additionalTowns.join(', ')}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h2>What to have ready</h2>
+      <p>
+        None of this is required, and you can call with none of it. It just means we can tell you
+        more on the first call instead of the second.
+      </p>
+      <ul>
+        <li>
+          <strong>Any test result you already have</strong>, including the number and how it was
+          measured. An inspection report is plenty.
+        </li>
+        <li>
+          <strong>Your foundation type</strong>: basement, slab, crawl space, or some combination.
+          This is the single biggest driver of what a system costs.
+        </li>
+        <li>
+          <strong>Roughly how large the ground-contact footprint is</strong>, which affects whether
+          one suction point covers the house.
+        </li>
+        <li>
+          <strong>Whether there is a deadline</strong>, such as a closing date. Say so up front and
+          we will tell you honestly whether it is realistic.
+        </li>
+        <li>
+          <strong>Whether there is already a system on the house</strong>, and if so whether the
+          manometer shows suction. That changes the conversation from install to
+          <a href="/services/system-repair/">repair</a>.
+        </li>
+      </ul>
+
+      <h2>What happens after you send the form</h2>
+      <p>
+        It reaches us directly. We follow up during {site.hours} to ask whatever the form did not
+        cover, give you a range for your specific situation, and schedule an on-site assessment if
+        that is the right next step. There is no automated drip sequence and your number is not sold
+        to anyone.
+      </p>
+
+      <h2>About who does the work</h2>
+      <p>
+        {site.brand} connects {site.city} property owners with {site.localFacts.certifier}-certified
+        radon professionals. {site.state} requires certification from the {
+          site.localFacts.certifierFull
+        } to perform radon testing and mitigation, and the work on your property is done by someone
+        who holds it. The longer version is on the <a href="/about/">about page</a>.
+      </p>
+    </div>
+
+      <Fragment slot="aside">
+        <QuoteForm
+          formId="contact:main"
+          heading="Request a free quote"
+          subheading="Two required fields. We will ask the rest when we follow up."
+        />
+      </Fragment>
+    </ContentWithAside>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-body {
+    padding-block: var(--s-4) var(--s-8);
+  }
+
+  .contact-cards {
+    display: grid;
+    gap: var(--s-3);
+    margin-block: var(--s-5) var(--s-6);
+  }
+
+  .contact-card {
+    display: flex;
+    gap: var(--s-4);
+    padding: var(--s-4);
+    background: var(--blue-50);
+    border-radius: var(--r-md);
+  }
+
+  .cc-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--r-md);
+    background: var(--white);
+    color: var(--blue-600);
+  }
+
+  .contact-card h2 {
+    margin: 0 0 var(--s-1);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+  }
+
+  .cc-value {
+    margin: 0 0 2px;
+    font-size: 1.0625rem;
+    font-weight: 650;
+    color: var(--primary-text);
+  }
+  .cc-value :global(a) {
+    color: var(--link);
+    text-decoration: none;
+  }
+  .cc-value :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  .cc-note {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--muted-text);
+  }
+
+</style>

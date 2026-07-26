@@ -1,0 +1,10 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist", "node_modules"],
+  "compilerOptions": {
+    // Pages Functions run on workerd, not Node. These types are what give
+    // D1Database and PagesFunction their shapes in functions/.
+    "types": ["astro/client", "@cloudflare/workers-types"]
+  }
+}

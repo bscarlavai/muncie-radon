@@ -1,0 +1,49 @@
+---
+/**
+ * Brand mark: a shield with rising gas.
+ *
+ * On the geometry: the arrow's optical centre is (apex + tail) / 2, because
+ * round caps extend the apex and the tail by the same amount. That is solved
+ * against the shield's optical centre of y=15, NOT its geometric centre of
+ * y=16. A shield tapers to a point at the bottom, so its visual mass sits high
+ * and centering on the geometric middle makes it look bottom-heavy. If you
+ * move the arrow, keep (apex + tail) / 2 === 15.
+ *
+ * Local note: Muncie's recognisable marks (Ball Corporation, Ball State,
+ * Minnetrista) are live trademarks, so none of them are available to lean on.
+ */
+interface Props {
+  size?: number;
+  class?: string;
+  title?: string;
+}
+
+const { size = 32, class: className, title } = Astro.props;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 32 32"
+  fill="none"
+  role={title ? 'img' : undefined}
+  aria-hidden={title ? undefined : 'true'}
+  class={className}
+>
+  {title && <title>{title}</title>}
+
+  <g
+    stroke="currentColor"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <!-- Shield -->
+    <path d="M16 2.8 L27 6.8 V15.6 C27 22.6 16 29.2 16 29.2 C16 29.2 5 22.6 5 15.6 V6.8 Z" />
+
+    <!-- Rising gas, optically centred on y=15 -->
+    <path d="M16 20.5 V9.5" />
+    <path d="M12.3 13.2 L16 9.5 L19.7 13.2" />
+  </g>
+</svg>

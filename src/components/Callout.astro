@@ -1,0 +1,88 @@
+---
+/** Emphasis block for the one fact on a page that must not be skimmed past. */
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  tone?: 'info' | 'warn' | 'good' | 'money';
+  title?: string;
+}
+
+const { tone = 'info', title } = Astro.props;
+
+const icons = {
+  info: 'lucide:info',
+  warn: 'lucide:triangle-alert',
+  good: 'lucide:circle-check-big',
+  money: 'lucide:banknote',
+} as const;
+---
+
+<aside class:list={['callout', `tone-${tone}`]}>
+  <span class="callout-icon" aria-hidden="true"><Icon name={icons[tone]} size={20} /></span>
+  <div class="callout-body">
+    {title && <p class="callout-title">{title}</p>}
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .callout {
+    display: flex;
+    gap: var(--s-3);
+    margin: var(--s-5) 0;
+    padding: var(--s-4) var(--s-5);
+    border-radius: var(--r-md);
+    border-left: 4px solid;
+    max-width: var(--measure);
+  }
+
+  .callout-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .callout-body :global(p) {
+    margin-bottom: var(--s-2);
+  }
+  .callout-body :global(p:last-child),
+  .callout-body :global(ul:last-child) {
+    margin-bottom: 0;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    color: var(--primary-text);
+  }
+
+  .tone-info {
+    background: var(--blue-50);
+    border-color: var(--blue-500);
+  }
+  .tone-info .callout-icon {
+    color: var(--blue-600);
+  }
+
+  .tone-warn {
+    background: var(--yellow-100);
+    border-color: var(--yellow-700);
+  }
+  .tone-warn .callout-icon {
+    color: var(--yellow-700);
+  }
+
+  .tone-good {
+    background: var(--green-100);
+    border-color: var(--green-700);
+  }
+  .tone-good .callout-icon {
+    color: var(--green-700);
+  }
+
+  .tone-money {
+    background: var(--amber-100);
+    border-color: var(--amber-600);
+  }
+  .tone-money .callout-icon {
+    color: var(--amber-600);
+  }
+</style>

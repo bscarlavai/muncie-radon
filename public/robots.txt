@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# API endpoints are POST-only and have nothing to index.
+Disallow: /api/
+
+Sitemap: https://muncieradon.com/sitemap-index.xml

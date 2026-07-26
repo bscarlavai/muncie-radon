@@ -1,0 +1,65 @@
+---
+import { site } from '../site.config';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PhoneLink from '../components/PhoneLink.astro';
+import ServiceGrid from '../components/ServiceGrid.astro';
+---
+
+<BaseLayout
+  title={`Page not found | ${site.brand}`}
+  description="That page does not exist. Here is where to find what you were looking for."
+  noindex
+>
+  <section class="section notfound">
+    <div class="wrap-narrow text-center">
+      <p class="code">404</p>
+      <h1>That page does not exist</h1>
+      <p class="lead center-measure">
+        Either the link is wrong or we moved something. If you were looking for a price, a test
+        result explanation, or a straight answer about your radon number, it is one of the links
+        below.
+      </p>
+      <div class="nf-actions">
+        <PhoneLink placement="404" variant="button" />
+        <a href="/contact/" class="btn btn-secondary">Get a free quote</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="wrap">
+      <h2 class="mt-0">Radon services in {site.city}</h2>
+      <ServiceGrid />
+      <p class="mb-0">
+        Or start at the <a href="/">home page</a>, browse
+        <a href="/service-areas/">service areas</a>, or read
+        <a href="/about/">how this works</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .notfound {
+    padding-block: var(--s-8);
+    background: linear-gradient(180deg, var(--blue-50) 0%, var(--white) 100%);
+  }
+
+  .code {
+    margin: 0 0 var(--s-3);
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--blue-500);
+    max-width: none;
+  }
+
+  .nf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-3);
+    margin-top: var(--s-5);
+  }
+</style>

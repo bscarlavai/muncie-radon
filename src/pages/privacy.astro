@@ -1,0 +1,125 @@
+---
+import { site } from '../site.config';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+const title = `Privacy Policy | ${site.brand}`;
+const description = `How ${site.brand} collects, uses, and stores the information you submit through the quote form or by calling our tracking number.`;
+
+const updated = 'July 2026';
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="wrap">
+    <Breadcrumbs crumbs={[{ label: 'Privacy Policy' }]} />
+  </div>
+
+  <div class="wrap-narrow prose policy">
+    <h1>Privacy Policy</h1>
+    <p class="lead">Last updated: {updated}</p>
+
+    <p>
+      This policy covers {site.domain}. It is written to be read rather than to be defensible, so
+      it is short and specific.
+    </p>
+
+    <h2>What we collect</h2>
+    <p><strong>When you submit the quote form:</strong> your name, phone number, the service you
+      selected, anything you typed in the message field, which page you submitted from, and any
+      campaign parameters in the URL. We also record the time of submission.</p>
+    <p><strong>When you call the number on this site:</strong> that number is a tracking line. We
+      record your caller ID, the time and duration of the call, and which page you were on if the
+      call came from a click on this site. <strong>Calls may be recorded</strong> for quality and
+      accuracy, and you will hear an announcement to that effect at the start of the call.</p>
+    <p><strong>When you simply browse:</strong> aggregate, privacy-preserving page analytics with no
+      cookies and no cross-site tracking. We do not run Google Analytics, advertising pixels, or
+      third-party trackers on this site.</p>
+
+    <h2>What we do with it</h2>
+    <p>
+      We use your contact information to respond to your request, quote your job, and route it to a
+      certified radon professional who can perform the work. That routing is the entire purpose of
+      this site, and submitting the form means your information will be shared with the professional
+      assigned to your job.
+    </p>
+    <p>
+      We use the page and campaign data to understand which pages produce real inquiries, so we know
+      what to write more of.
+    </p>
+
+    <h2>What we do not do with it</h2>
+    <ul>
+      <li><strong>We do not sell your information.</strong> Not to data brokers, not to lead
+        aggregators, not to anyone.</li>
+      <li><strong>We do not share it beyond the professional assigned to your job</strong>, plus the
+        service providers listed below who process it on our behalf.</li>
+      <li><strong>We do not put you into an automated marketing sequence.</strong> If you do not
+        proceed, you stop hearing from us.</li>
+      <li><strong>We do not run advertising or retargeting pixels</strong>, so submitting this form
+        will not cause radon ads to follow you around the internet.</li>
+    </ul>
+
+    <h2>Service providers</h2>
+    <p>
+      We use a small number of third parties to operate the site. Each of them processes data on our
+      behalf under their own terms:
+    </p>
+    <ul>
+      <li><strong>Cloudflare</strong> hosts the site, stores form and call records, and provides
+        privacy-preserving analytics.</li>
+      <li><strong>Twilio</strong> provides the tracking phone number and handles call routing and
+        recording.</li>
+      <li><strong>Resend</strong> delivers the email notification that tells us a form came in.</li>
+    </ul>
+
+    <h2>How long we keep it</h2>
+    <p>
+      Inquiry records and call logs are retained while they are useful for serving customers and
+      understanding site performance. If you would like your information deleted, email {' '}
+      <a href={`mailto:${site.email}`}>{site.email}</a> and we will remove it, including call
+      recordings, and confirm when it is done.
+    </p>
+
+    <h2>Your choices</h2>
+    <ul>
+      <li><strong>Do not want a call recorded?</strong> Say so when you are connected and recording
+        for that call will stop, or use the form instead.</li>
+      <li><strong>Prefer not to give a phone number?</strong> Email us at {' '}
+        <a href={`mailto:${site.email}`}>{site.email}</a> instead. A phone number is on the form
+        because a radon quote is genuinely faster by phone, not because we require one to talk.</li>
+      <li><strong>Want your data removed?</strong> Ask, and we will do it.</li>
+    </ul>
+
+    <h2>Children</h2>
+    <p>
+      This site is intended for property owners and is not directed at children. We do not knowingly
+      collect information from anyone under 13.
+    </p>
+
+    <h2>Changes</h2>
+    <p>
+      If this policy changes materially, the updated date at the top changes with it. We do not
+      backdate revisions.
+    </p>
+
+    <h2>Contact</h2>
+    <p class="mb-0">
+      Questions about this policy, or about what we hold on you:{' '}
+      <a href={`mailto:${site.email}`}>{site.email}</a>, or call {site.phone.display}.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .policy {
+    padding-block: var(--s-4) var(--s-8);
+  }
+  .policy h1 {
+    margin-bottom: var(--s-3);
+  }
+  .policy .lead {
+    color: var(--muted-text);
+    font-size: 0.9375rem;
+    margin-bottom: var(--s-6);
+  }
+</style>

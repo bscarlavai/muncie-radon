@@ -1,0 +1,125 @@
+---
+import { getCollection, render } from 'astro:content';
+import { site, areaBySlug } from '../../site.config';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import QuoteForm from '../../components/QuoteForm.astro';
+import Faq from '../../components/Faq.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import ServiceGrid from '../../components/ServiceGrid.astro';
+import { Icon } from 'astro-icon/components';
+import ContentWithAside from '../../components/ContentWithAside.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('areas');
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+
+const area = areaBySlug(entry.id);
+if (!area) {
+  throw new Error(
+    `Content file src/content/areas/${entry.id}.mdx has no matching entry in site.config.ts areas[].`,
+  );
+}
+---
+
+<BaseLayout title={data.title} description={data.description}>
+  <PageHero
+    h1={data.h1}
+    intro={data.intro}
+    eyebrow={`${area.county} · ${area.driveTime} from ${site.city}`}
+    crumbs={[{ label: 'Service Areas', href: '/service-areas/' }, { label: area.name }]}
+    placement={`hero:area-${entry.id}`}
+  />
+
+  <section class="section">
+    <div class="wrap">
+      <h2 class="mt-0">What we know about radon in {area.name}</h2>
+      <ul class="fact-list">
+        {
+          data.localFacts.map((fact) => (
+            <li>
+              <span class="fact-icon" aria-hidden="true"><Icon name="lucide:check" size={16} /></span>
+              <span set:html={fact} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <div class="wrap page-body">
+    <ContentWithAside>
+      <article class="prose">
+        <Content />
+        {data.faqs.length > 0 && <Faq items={data.faqs} />}
+      </article>
+
+      <Fragment slot="aside">
+        <QuoteForm
+          formId={`area:${entry.id}`}
+          heading={`Free quote in ${area.name}`}
+          subheading={`We're ${area.driveTime} away. Tell us what you're dealing with and we'll get you a real number.`}
+          compact
+        />
+      </Fragment>
+    </ContentWithAside>
+  </div>
+
+  <section class="section section-alt">
+    <div class="wrap">
+      <h2 class="mt-0">Radon services in {area.name}</h2>
+      <ServiceGrid only={data.featuredServices} />
+    </div>
+  </section>
+
+  <CtaBand
+    placement={`footer-cta:area-${entry.id}`}
+    heading={`Radon testing and mitigation in ${area.name}, ${site.stateAbbr}`}
+    body={`${area.driveTime} from ${site.city}, same pricing, same free estimate. Call or send the form and we'll tell you what your ${area.name} home actually needs.`}
+    formHref="#quote"
+    formLabel="Back to quote form"
+  />
+</BaseLayout>
+
+<style>
+  .fact-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--s-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+  }
+
+  .fact-list li {
+    display: flex;
+    gap: var(--s-3);
+    margin: 0;
+    padding: var(--s-4);
+    background: var(--blue-50);
+    border-radius: var(--r-md);
+    font-size: 0.9375rem;
+  }
+
+  .fact-icon {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    border-radius: var(--r-full);
+    background: var(--green-700);
+    color: var(--white);
+  }
+
+  .page-body {
+    padding-block: var(--s-6) var(--s-7);
+  }
+</style>

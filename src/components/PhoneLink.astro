@@ -1,0 +1,65 @@
+---
+/**
+ * The ONLY component allowed to render a tel: link or the phone number.
+ * Everything routes through here so the tracking-number audit has exactly one
+ * source to check, and so the click-to-call ping fires consistently sitewide.
+ */
+import { site } from '../site.config';
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  /** Visual treatment */
+  variant?: 'button' | 'button-inverse' | 'inline' | 'plain';
+  /** Where on the page this instance lives: recorded with the click event */
+  placement: string;
+  showIcon?: boolean;
+  block?: boolean;
+  label?: string;
+  class?: string;
+}
+
+const {
+  variant = 'button',
+  placement,
+  showIcon = true,
+  block = false,
+  label,
+  class: className,
+} = Astro.props;
+
+const classes = [
+  variant === 'button' && 'btn btn-primary',
+  variant === 'button-inverse' && 'btn btn-ghost-inverse',
+  variant === 'inline' && 'phone-inline',
+  block && 'btn-block',
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<a
+  href={`tel:${site.phone.tel}`}
+  class={classes}
+  data-call-cta
+  data-placement={placement}
+  aria-label={`Call ${site.brand} at ${site.phone.display}`}
+>
+  {showIcon && <Icon name="lucide:phone" size={variant === 'inline' ? 16 : 20} />}
+  <span>{label ?? site.phone.display}</span>
+</a>
+
+<style>
+  .phone-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-weight: 650;
+    color: var(--link);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .phone-inline:hover {
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,228 @@
+---
+import { site } from '../site.config';
+import PhoneLink from './PhoneLink.astro';
+import { Icon } from 'astro-icon/components';
+import Logo from './Logo.astro';
+
+const year = new Date().getFullYear();
+
+/**
+ * Deliberately NOT linked and deliberately NOT overlapping the "Service areas"
+ * column above. That column is the towns with their own page; this row is the
+ * rest of the coverage footprint. Towns land here until someone writes a page
+ * with facts true only of that town, because a spun page with the name swapped
+ * is worse than no page.
+ */
+const townsWithoutPages = site.additionalTowns;
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <span class="brand-mark" aria-hidden="true"><Logo size={26} /></span>
+      <p class="brand-name">{site.brand}</p>
+      <p class="brand-blurb">{site.tagline}.</p>
+
+      <!-- NAP: name + phone only. No street address: this is a service-area
+           business, and inventing one would poison citation consistency later. -->
+      <div class="nap">
+        <PhoneLink placement="footer" variant="inline" />
+        <a href={`mailto:${site.email}`} class="nap-line">
+          <Icon name="lucide:mail" size={16} />
+          <span>{site.email}</span>
+        </a>
+        <p class="nap-line">
+          <Icon name="lucide:clock" size={16} />
+          <span>{site.hours}</span>
+        </p>
+        <p class="nap-line">
+          <Icon name="lucide:map-pin" size={16} />
+          <span>Serving {site.city} &amp; {site.region}</span>
+        </p>
+      </div>
+    </div>
+
+    <nav class="footer-col" aria-label="Services">
+      <h2>Services</h2>
+      <ul>
+        {
+          site.services.map((service) => (
+            <li>
+              <a href={`/services/${service.slug}/`}>{service.name}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <nav class="footer-col" aria-label="Service areas">
+      <h2>Service areas</h2>
+      <ul>
+        <li><a href="/service-areas/">All service areas</a></li>
+        {
+          site.areas.map((area) => (
+            <li>
+              <a href={`/service-areas/${area.slug}/`}>{area.name}, {site.stateAbbr}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <nav class="footer-col" aria-label="Company">
+      <h2>Company</h2>
+      <ul>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/contact/">Contact &amp; free quote</a></li>
+        <li><a href="/privacy/">Privacy policy</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="wrap footer-towns">
+    <p>
+      <strong>Also serving:</strong>{' '}{townsWithoutPages.join(' · ')}
+    </p>
+  </div>
+
+  <div class="wrap footer-legal">
+    <p>&copy; {year} {site.brand}. All rights reserved.</p>
+    <p>
+      {site.brand} is a lead referral service. Radon testing and mitigation work is performed by
+      independent {site.localFacts.certifier}-certified professionals. {site.state} requires{' '}
+      {site.localFacts.certifier} certification to provide radon services.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    /* No margin-top. Every page ends in a full-bleed section, and a margin here
+       punches a white band between that section and the footer. */
+    padding-top: var(--s-8);
+    background: var(--navy-900);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9375rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    gap: var(--s-6);
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    padding-bottom: var(--s-7);
+  }
+
+  .brand-mark {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--r-md);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    margin-bottom: var(--s-3);
+  }
+
+  .brand-name {
+    margin: 0 0 var(--s-2);
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--white);
+  }
+
+  .brand-blurb {
+    margin-bottom: var(--s-5);
+    max-width: 34ch;
+  }
+
+  .nap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .nap :global(.phone-inline) {
+    color: var(--white);
+    font-size: 1.125rem;
+  }
+
+  .nap-line {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+  }
+  a.nap-line:hover {
+    color: var(--white);
+    text-decoration: underline;
+  }
+
+  .footer-col h2 {
+    margin: 0 0 var(--s-3);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .footer-col li {
+    margin-bottom: var(--s-1);
+  }
+  .footer-col a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    color: rgba(255, 255, 255, 0.78);
+    text-decoration: none;
+  }
+  .footer-col a:hover {
+    color: var(--white);
+    text-decoration: underline;
+  }
+
+  .footer-towns {
+    padding-block: var(--s-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .footer-towns p {
+    margin: 0;
+    max-width: none;
+  }
+  .footer-towns strong {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .footer-legal {
+    padding-block: var(--s-4) var(--s-6);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .footer-legal p {
+    margin: 0 0 var(--s-2);
+    max-width: none;
+  }
+
+  @media (max-width: 860px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

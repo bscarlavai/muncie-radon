@@ -1,0 +1,375 @@
+/* ============================================================
+   DESIGN TOKENS
+   Semantic names only. Never use a raw hex outside this block.
+   ============================================================ */
+:root {
+  /* Brand */
+  --navy-900: #0d1f31;
+  --navy-800: #12293f;
+  --navy-700: #1a3a56;
+  --blue-600: #1462a0;
+  --blue-500: #1a7ac4;
+  --blue-100: #e4f0f9;
+  --blue-50: #f2f8fc;
+
+  /* Action: high-contrast CTA, deliberately off-brand-hue so it never blends in */
+  --amber-600: #b8500a;
+  --amber-500: #d9620d;
+  --amber-100: #fdf0e4;
+
+  /* Status */
+  --green-700: #14663f;
+  --green-100: #e3f4ec;
+  --red-700: #a32020;
+  --red-100: #fbe8e8;
+  --yellow-700: #8a6100;
+  --yellow-100: #fdf3dc;
+
+  /* Neutrals */
+  --gray-900: #16202b;
+  --gray-700: #41505f;
+  /* Darkened from #6b7a8a, which measured 4.40:1 on white and 4.13:1 on
+     --alt-bg: both under the 4.5:1 AA floor for body text. This value clears
+     it on BOTH backgrounds (5.38:1 white, 4.91:1 alt). Muted text is where
+     contrast quietly fails, so re-measure if you ever lighten this. */
+  --gray-500: #5f6c78;
+  --gray-300: #cdd6df;
+  --gray-200: #e2e8ee;
+  --gray-100: #f1f5f8;
+  --white: #ffffff;
+
+  /* Semantic */
+  --primary-text: var(--gray-900);
+  --body-text: var(--gray-700);
+  --muted-text: var(--gray-500);
+  --inverse-text: var(--white);
+  --page-bg: var(--white);
+  --alt-bg: var(--gray-100);
+  --card-bg: var(--white);
+  --brand-bg: var(--navy-800);
+  --accent: var(--amber-600);
+  --accent-hover: var(--amber-500);
+  --link: var(--blue-600);
+  --subtle-border: rgba(22, 32, 43, 0.08);
+  --field-border: rgba(22, 32, 43, 0.22);
+  --focus-ring: var(--blue-500);
+
+  /* Spacing scale */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4rem;
+  --s-9: 6rem;
+
+  /* Radii */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-full: 999px;
+
+  /* Type */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --measure: 68ch;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgba(13, 31, 49, 0.06), 0 1px 3px rgba(13, 31, 49, 0.08);
+  --shadow-md: 0 4px 12px rgba(13, 31, 49, 0.08), 0 2px 4px rgba(13, 31, 49, 0.06);
+  --shadow-lg: 0 12px 32px rgba(13, 31, 49, 0.12), 0 4px 8px rgba(13, 31, 49, 0.06);
+
+  /* Layout */
+  --wrap: 1140px;
+  --wrap-narrow: 780px;
+  --header-h: 64px;
+}
+
+/* ============================================================
+   RESET / BASE
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + var(--s-4));
+}
+
+/* The sticky header grows a second nav row below 940px: anchor offsets follow it. */
+@media (max-width: 940px) {
+  html { scroll-padding-top: calc(var(--header-h) + 44px + var(--s-4)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--body-text);
+  background: var(--page-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  color: var(--primary-text);
+  line-height: 1.2;
+  margin: 0 0 var(--s-4);
+  text-wrap: balance;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+h1 { font-size: clamp(1.9rem, 1.35rem + 2.4vw, 2.85rem); }
+h2 { font-size: clamp(1.45rem, 1.2rem + 1.1vw, 1.9rem); margin-top: var(--s-7); }
+h3 { font-size: clamp(1.15rem, 1.05rem + 0.45vw, 1.3rem); margin-top: var(--s-5); }
+h4 { font-size: 1.05rem; margin-top: var(--s-5); }
+
+p, ul, ol {
+  margin: 0 0 var(--s-4);
+  max-width: var(--measure);
+}
+
+ul, ol { padding-left: 1.35rem; }
+li { margin-bottom: var(--s-2); }
+li > ul, li > ol { margin-top: var(--s-2); }
+
+a {
+  color: var(--link);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+a:hover { color: var(--navy-700); }
+
+strong { color: var(--primary-text); font-weight: 650; }
+
+img { max-width: 100%; height: auto; display: block; }
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--subtle-border);
+  margin: var(--s-7) 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* ============================================================
+   LAYOUT PRIMITIVES
+   ============================================================ */
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--s-5);
+}
+
+.wrap-narrow {
+  width: 100%;
+  max-width: var(--wrap-narrow);
+  margin-inline: auto;
+  padding-inline: var(--s-5);
+}
+
+.section {
+  padding-block: var(--s-8);
+}
+
+.section-alt {
+  background: var(--alt-bg);
+  border-block: 1px solid var(--subtle-border);
+}
+
+.section-brand {
+  background: var(--brand-bg);
+  color: rgba(255, 255, 255, 0.86);
+}
+.section-brand h1,
+.section-brand h2,
+.section-brand h3 { color: var(--white); }
+/* Body links only. Without :not(.btn) this out-specifies .btn-primary and
+   repaints button labels light blue on orange. */
+.section-brand a:not(.btn) { color: #9ed2f5; }
+
+.stack > * + * { margin-top: var(--s-4); }
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue-600);
+  margin-bottom: var(--s-3);
+}
+.section-brand .eyebrow { color: #7cc0ec; }
+
+.lead {
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  color: var(--body-text);
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 999;
+  background: var(--white);
+  color: var(--navy-800);
+  padding: var(--s-3) var(--s-4);
+  font-weight: 600;
+}
+.skip-link:focus {
+  left: var(--s-4);
+  top: var(--s-2);
+}
+
+/* ============================================================
+   BUTTONS: 44px minimum tap target everywhere
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 48px;
+  padding: var(--s-3) var(--s-5);
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 650;
+  font-size: 1.0625rem;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--white);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  color: var(--white);
+}
+
+.btn-secondary {
+  background: var(--white);
+  color: var(--navy-800);
+  border-color: var(--field-border);
+}
+.btn-secondary:hover {
+  background: var(--gray-100);
+  color: var(--navy-800);
+}
+
+.btn-ghost-inverse {
+  background: transparent;
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.btn-ghost-inverse:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--white);
+}
+
+.btn-block { width: 100%; }
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--subtle-border);
+  border-radius: var(--r-lg);
+  padding: var(--s-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.grid {
+  display: grid;
+  gap: var(--s-4);
+}
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+/* ============================================================
+   PROSE: long-form page body
+   ============================================================ */
+.prose h2:first-child { margin-top: 0; }
+.prose > table { margin-bottom: var(--s-5); }
+
+.prose blockquote {
+  margin: var(--s-5) 0;
+  padding: var(--s-4) var(--s-5);
+  background: var(--blue-50);
+  border-left: 4px solid var(--blue-500);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+}
+.prose blockquote p:last-child { margin-bottom: 0; }
+
+/* Tables must scroll inside their own container, never the page */
+.table-scroll {
+  overflow-x: auto;
+  margin-bottom: var(--s-5);
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  min-width: 460px;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+th, td {
+  text-align: left;
+  padding: var(--s-3);
+  border-bottom: 1px solid var(--gray-200);
+  vertical-align: top;
+}
+th {
+  color: var(--primary-text);
+  font-weight: 650;
+  background: var(--gray-100);
+}
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-center { text-align: center; }
+.mb-0 { margin-bottom: 0; }
+.mt-0 { margin-top: 0; }
+.center-measure { margin-inline: auto; }

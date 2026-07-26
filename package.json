@@ -1,0 +1,35 @@
+{
+  "name": "muncie-radon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "astro dev",
+    "build": "node scripts/audit.mjs && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "audit": "node scripts/audit.mjs",
+    "icons": "node scripts/gen-icons.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@astrojs/mdx": "^7.0.3",
+    "@astrojs/sitemap": "^3.7.3",
+    "@iconify-json/lucide": "^1.2.119",
+    "astro": "^7.1.3",
+    "astro-icon": "^1.1.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@cloudflare/workers-types": "^5.20260726.1",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.114.0"
+  }
+}

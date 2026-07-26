@@ -1,0 +1,61 @@
+---
+/** Interior-page hero: H1 + answer-first intro + dual CTA. Used by every
+    non-home page so the conversion path starts above the fold everywhere. */
+import PhoneLink from './PhoneLink.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import type { Crumb } from './Breadcrumbs.astro';
+
+interface Props {
+  h1: string;
+  intro: string;
+  eyebrow?: string;
+  crumbs: Crumb[];
+  placement: string;
+  formHref?: string;
+}
+
+const { h1, intro, eyebrow, crumbs, placement, formHref = '#quote' } = Astro.props;
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <Breadcrumbs crumbs={crumbs} />
+    {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+    <h1>{h1}</h1>
+    <p class="lead hero-intro">{intro}</p>
+    <div class="hero-actions">
+      <PhoneLink placement={placement} variant="button" />
+      <a href={formHref} class="btn btn-secondary">Get a free quote</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    padding-bottom: var(--s-7);
+    background: linear-gradient(180deg, var(--blue-50) 0%, var(--white) 100%);
+    border-bottom: 1px solid var(--subtle-border);
+  }
+
+  h1 {
+    margin-bottom: var(--s-4);
+    max-width: 22ch;
+  }
+
+  .hero-intro {
+    max-width: 62ch;
+    margin-bottom: var(--s-5);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+
+  @media (max-width: 520px) {
+    .hero-actions :global(.btn) {
+      flex: 1 1 100%;
+    }
+  }
+</style>

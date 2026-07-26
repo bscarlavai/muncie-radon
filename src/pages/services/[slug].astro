@@ -1,0 +1,91 @@
+---
+import { getCollection, render } from 'astro:content';
+import { site, serviceBySlug } from '../../site.config';
+import { serviceSchema } from '../../lib/schema';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import QuoteForm from '../../components/QuoteForm.astro';
+import Faq from '../../components/Faq.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import ServiceGrid from '../../components/ServiceGrid.astro';
+import ContentWithAside from '../../components/ContentWithAside.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('services');
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+
+const configured = serviceBySlug(entry.id);
+if (!configured) {
+  throw new Error(
+    `Content file src/content/services/${entry.id}.mdx has no matching entry in site.config.ts services[]. ` +
+      `Every service page must be declared in config so nav, footer, and cards stay in sync.`,
+  );
+}
+
+const path = `/services/${entry.id}/`;
+
+const schema = [
+  serviceSchema({
+    name: `${configured.name} in ${site.city}, ${site.stateAbbr}`,
+    description: data.description,
+    path,
+    priceRange: data.priced
+      ? { min: site.priceRangeMin, max: site.priceRangeMax }
+      : undefined,
+  }),
+];
+
+const related = data.related.length
+  ? data.related
+  : site.services.filter((s) => s.slug !== entry.id).slice(0, 3).map((s) => s.slug);
+---
+
+<BaseLayout title={data.title} description={data.description} schema={schema}>
+  <PageHero
+    h1={data.h1}
+    intro={data.intro}
+    eyebrow={`${site.city} ${site.stateAbbr}`}
+    crumbs={[{ label: 'Services', href: '/services/' }, { label: configured.name }]}
+    placement={`hero:${entry.id}`}
+  />
+
+  <div class="wrap page-body">
+    <ContentWithAside>
+      <article class="prose">
+        <Content />
+        {data.faqs.length > 0 && <Faq items={data.faqs} />}
+      </article>
+
+      <Fragment slot="aside">
+        <QuoteForm
+          formId={`service:${entry.id}`}
+          defaultService={entry.id}
+          heading="Get a free quote"
+          subheading={`Straight numbers for your ${site.city} home. No obligation, no sales visit required to get a range.`}
+          headingLevel={2}
+          compact
+        />
+      </Fragment>
+    </ContentWithAside>
+  </div>
+
+  <section class="section section-alt">
+    <div class="wrap">
+      <h2 class="mt-0">Related radon services</h2>
+      <ServiceGrid only={related} exclude={entry.id} />
+    </div>
+  </section>
+
+  <CtaBand placement={`footer-cta:${entry.id}`} formHref="#quote" formLabel="Back to quote form" />
+</BaseLayout>
+
+<style>
+  .page-body {
+    padding-block: var(--s-7);
+  }
+</style>

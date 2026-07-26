@@ -1,0 +1,121 @@
+---
+/**
+ * The "what we do" section. Doubles as the internal link hub: every page that
+ * renders this feeds link equity to all six service pages.
+ */
+import { site } from '../site.config';
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  /** Limit to specific slugs (area pages show the top 3) */
+  only?: string[];
+  /** Hide the card that points at the page you're already on */
+  exclude?: string;
+  showPricing?: boolean;
+  /**
+   * Card heading level. Defaults to 3, which is correct when this grid sits
+   * under an h2. On /services/ the grid IS the page's primary content with no
+   * h2 above it, so it takes 2 to avoid an h1 -> h3 skip.
+   */
+  headingLevel?: 2 | 3;
+}
+
+const { only, exclude, showPricing = true, headingLevel = 3 } = Astro.props;
+const CardHeading = `h${headingLevel}` as 'h2' | 'h3';
+
+const services = site.services
+  .filter((service) => (only ? only.includes(service.slug) : true))
+  .filter((service) => service.slug !== exclude)
+  .sort((a, b) => (only ? only.indexOf(a.slug) - only.indexOf(b.slug) : 0));
+---
+
+<div class="service-grid">
+  {
+    services.map((service) => (
+      <a href={`/services/${service.slug}/`} class="service-card">
+        <span class="service-icon" aria-hidden="true">
+          <Icon name={service.icon} size={24} />
+        </span>
+        <CardHeading>{service.name}</CardHeading>
+        <p class="service-blurb">{service.blurb}</p>
+        {showPricing && service.priceNote && <p class="service-price">{service.priceNote}</p>}
+        <span class="service-more" aria-hidden="true">
+          Learn more
+          <Icon name="lucide:arrow-right" size={16} />
+        </span>
+      </a>
+    ))
+  }
+</div>
+
+<style>
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--s-4);
+    margin: var(--s-5) 0;
+  }
+
+  .service-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--s-5);
+    background: var(--card-bg);
+    border: 1px solid var(--subtle-border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: var(--body-text);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+  .service-card:hover {
+    border-color: var(--blue-500);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    color: var(--body-text);
+  }
+
+  .service-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: var(--s-3);
+    border-radius: var(--r-md);
+    background: var(--blue-100);
+    color: var(--blue-600);
+  }
+
+  .service-card :is(h2, h3) {
+    margin: 0 0 var(--s-2);
+    margin-top: 0;
+    font-size: 1.125rem;
+    color: var(--primary-text);
+  }
+
+  .service-blurb {
+    margin: 0 0 var(--s-4);
+    font-size: 0.9375rem;
+    max-width: none;
+  }
+
+  .service-price {
+    margin: 0 0 var(--s-4);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--amber-600);
+  }
+
+  .service-more {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin-top: auto;
+    font-size: 0.9375rem;
+    font-weight: 650;
+    color: var(--link);
+  }
+  .service-card:hover .service-more {
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,93 @@
+---
+/** Visible breadcrumb trail + BreadcrumbList JSON-LD from one source. */
+import { site } from '../site.config';
+
+export interface Crumb {
+  label: string;
+  /** Omit on the current page (last crumb) */
+  href?: string;
+}
+
+interface Props {
+  crumbs: Crumb[];
+}
+
+const { crumbs } = Astro.props;
+const origin = `https://${site.domain}`;
+
+const all: Crumb[] = [{ label: 'Home', href: '/' }, ...crumbs];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: all.map((crumb, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: crumb.label,
+    ...(crumb.href ? { item: `${origin}${crumb.href}` } : {}),
+  })),
+};
+---
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    {
+      all.map((crumb, index) => (
+        <li>
+          {crumb.href && index < all.length - 1 ? (
+            <a href={crumb.href}>{crumb.label}</a>
+          ) : (
+            <span aria-current="page">{crumb.label}</span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />
+
+<style>
+  .breadcrumbs {
+    padding-block: var(--s-4);
+  }
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+    font-size: 0.8125rem;
+    color: var(--muted-text);
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+  }
+
+  li + li::before {
+    content: '/';
+    color: var(--gray-300);
+  }
+
+  a {
+    color: var(--muted-text);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--link);
+    text-decoration: underline;
+  }
+
+  [aria-current='page'] {
+    color: var(--gray-700);
+    font-weight: 600;
+  }
+</style>

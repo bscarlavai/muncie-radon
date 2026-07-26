@@ -1,0 +1,28 @@
+name = "muncie-radon"
+compatibility_date = "2026-07-01"
+pages_build_output_dir = "dist"
+
+# D1 is the receipts database. Every lead and every call lands here, and it is
+# what turns "the site ranks" into "here are 47 inbound leads with timestamps"
+# when it is time to pitch a renter.
+#
+# Create it once, then paste the returned id below:
+#   wrangler d1 create muncie-radon
+#   wrangler d1 execute muncie-radon --remote --file=./schema.sql
+[[d1_databases]]
+binding = "DB"
+database_name = "muncie-radon"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[vars]
+BRAND = "Muncie Radon"
+
+# Secrets are NOT set here. Set them in the Pages dashboard, or:
+#   wrangler pages secret put RESEND_API_KEY
+#   wrangler pages secret put TWILIO_AUTH_TOKEN
+#
+#   RESEND_API_KEY      Resend key for the new-lead notification email
+#   NOTIFY_TO           where new-lead emails go
+#   NOTIFY_FROM         verified Resend sender, e.g. leads@muncieradon.com
+#   FORWARD_TO          E.164 number the tracking line rings through to
+#   TWILIO_AUTH_TOKEN   verifies the Twilio webhook signature
