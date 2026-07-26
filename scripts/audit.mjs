@@ -88,6 +88,24 @@ if (/analyticsToken:\s*''/.test(config)) {
   warnings.push('Cloudflare Web Analytics token is empty; no pageview data will be collected.');
 }
 
+/* ---- 5. Deploy target is filled in ----------------------------------------- */
+// This site deploys to the apps account, not the personal one. An unreplaced
+// account_id is how a project ends up created in the wrong account, and an
+// unreplaced database_id means the deploy fails outright.
+const wrangler = readFileSync('wrangler.toml', 'utf8');
+for (const [placeholder, consequence] of [
+  ['REPLACE_WITH_ACCOUNT_ID', 'wrangler cannot tell which Cloudflare account to deploy to'],
+  ['REPLACE_WITH_D1_DATABASE_ID', 'the DB binding will not resolve and lead capture will fail'],
+]) {
+  const n = wrangler.split(placeholder).length - 1;
+  if (n) {
+    warnings.push(
+      `wrangler.toml still has ${placeholder} in ${n} place(s); ${consequence}. ` +
+        `Note the preview environment keeps its own copy of the database id.`,
+    );
+  }
+}
+
 /* ---- Report ---------------------------------------------------------------- */
 for (const w of warnings) console.warn(`\x1b[33mwarn\x1b[0m  ${w}`);
 for (const e of errors) console.error(`\x1b[31mfail\x1b[0m  ${e}`);

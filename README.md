@@ -30,6 +30,40 @@ restart.
 
 Work top to bottom. Nothing below depends on anything above it being skipped.
 
+### 0. Point wrangler at the right Cloudflare account
+
+This site lives in the apps account, **not** the personal account that holds the
+older Pages projects. Wrangler's default login is the personal one, so every
+command in this checklist would otherwise create resources in the wrong place.
+
+Do not `wrangler logout`. Use a named auth profile bound to this directory:
+
+```bash
+wrangler auth create muncie-radon      # opens the browser; log in as the APPS account
+wrangler auth activate muncie-radon .  # binds that profile to this directory
+```
+
+After that, every wrangler command run from this repo uses the apps account, and
+every command run from any other repo keeps using the personal login. Verify:
+
+```bash
+wrangler whoami        # from this directory: apps account
+wrangler auth list     # shows the profile and its bound directory
+```
+
+Then paste the account id from `whoami` into `account_id` in `wrangler.toml`.
+That pin is a guard, not a convenience: it makes a wrong-account session fail
+loudly instead of silently creating a second `muncie-radon` project somewhere
+you will not think to look.
+
+`wrangler auth` is marked experimental in wrangler 4.114. The fallback, if it
+misbehaves, is a scoped API token in the environment instead:
+
+```bash
+export CLOUDFLARE_ACCOUNT_ID=...
+export CLOUDFLARE_API_TOKEN=...   # Pages:Edit, D1:Edit on the apps account
+```
+
 ### 1. Tracking number
 
 - [ ] Provision the Twilio number for the 765 area code.
@@ -47,9 +81,13 @@ Never a dead end.
 
 ```bash
 wrangler d1 create muncie-radon
-# paste the returned database_id into wrangler.toml
 wrangler d1 execute muncie-radon --remote --file=./schema.sql
 ```
+
+Paste the returned id into **both** `database_id` slots in `wrangler.toml`, the
+top-level one and the one under `[env.preview]`. Pages does not inherit bindings
+into named environments, so a preview deployment with an empty `DB` binding 500s
+on every form submit. `npm run audit` warns until both are filled in.
 
 ### 3. Secrets
 
@@ -77,12 +115,35 @@ analytics.
 
 ### 5. Deploy
 
+Create the project once, then deploy:
+
 ```bash
+wrangler pages project create muncie-radon --production-branch=main
 npm run build
 wrangler pages deploy dist --project-name=muncie-radon
 ```
 
-Then attach the `muncieradon.com` custom domain in the Pages dashboard.
+That is direct upload: no GitHub remote required, and it is the fastest path to
+a live URL. The tradeoff is that deploys happen from your machine, so whatever
+is in `dist/` at that moment is what ships.
+
+To move to git-connected builds later (the pattern the other projects use),
+push the repo to GitHub, connect it in the Pages dashboard, and set the build
+command to `npm run build` with output directory `dist`. Cloudflare then builds
+on push. `npm run audit` runs as part of `npm run build`, so the house rules
+gate the deploy either way.
+
+**Custom domain.** The domain was registered in this same account, so the zone
+already exists and no nameserver change is needed.
+
+`site.config.ts` sets `domain: 'muncieradon.com'`, so **the apex is canonical**
+and every `<link rel="canonical">` and sitemap URL already points there. Add the
+apex as the Pages custom domain, then send www to it with a bulk redirect or a
+redirect rule (`www.muncieradon.com/*` → `https://muncieradon.com/$1`, 301).
+
+Do not serve both hostnames. Two hostnames answering the same pages splits link
+signals and makes GSC report the site twice, which is a slow problem to unwind
+after indexing starts.
 
 ### 6. Verify live
 

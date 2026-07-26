@@ -2,6 +2,14 @@ name = "muncie-radon"
 compatibility_date = "2026-07-01"
 pages_build_output_dir = "dist"
 
+# This repo deploys to a DIFFERENT Cloudflare account than the personal one that
+# holds the older projects. Pinning account_id here means a wrangler session
+# authenticated against the wrong account fails loudly instead of quietly
+# creating a second muncie-radon project in the wrong place.
+#
+# Get it from `wrangler whoami` while authenticated to the apps account.
+account_id = "REPLACE_WITH_ACCOUNT_ID"
+
 # D1 is the receipts database. Every lead and every call lands here, and it is
 # what turns "the site ranks" into "here are 47 inbound leads with timestamps"
 # when it is time to pitch a renter.
@@ -16,6 +24,26 @@ database_id = "REPLACE_WITH_D1_DATABASE_ID"
 
 [vars]
 BRAND = "Muncie Radon"
+
+# Pages supports exactly two named environments, "production" and "preview".
+# Everything above is production. Bindings are NOT inherited by named
+# environments, so preview needs its own copy: without this block a preview
+# deployment has no DB binding at all and every form submit 500s, which is the
+# kind of thing you discover from a real lead rather than a test.
+#
+# Preview points at the same database on purpose. A separate preview DB keeps
+# test rows out of the receipts, but it is a second thing to create and keep
+# schema'd, and an empty binding is a worse failure than a few test rows. To
+# split them later: create muncie-radon-preview, apply schema.sql to it, and
+# change the id below.
+[env.preview]
+[env.preview.vars]
+BRAND = "Muncie Radon"
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "muncie-radon"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
 
 # Secrets are NOT set here. Set them in the Pages dashboard, or:
 #   wrangler pages secret put RESEND_API_KEY
