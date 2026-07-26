@@ -36,19 +36,26 @@ This site lives in the apps account, **not** the personal account that holds the
 older Pages projects. Wrangler's default login is the personal one, so every
 command in this checklist would otherwise create resources in the wrong place.
 
+Commands below use `npx wrangler` deliberately. It resolves to the version pinned
+in `devDependencies`, which is the version this config was validated against. A
+global install is per-node-version under nvm, so it disappears when you switch
+node and drifts out of date on its own. That already happened once here: a global
+4.86.0 was shadowing the local 4.114.0 and did not have `wrangler auth` profiles
+at all.
+
 Do not `wrangler logout`. Use a named auth profile bound to this directory:
 
 ```bash
-wrangler auth create muncie-radon      # opens the browser; log in as the APPS account
-wrangler auth activate muncie-radon .  # binds that profile to this directory
+npx wrangler auth create muncie-radon      # opens the browser; log in as the APPS account
+npx wrangler auth activate muncie-radon .  # binds that profile to this directory
 ```
 
 After that, every wrangler command run from this repo uses the apps account, and
 every command run from any other repo keeps using the personal login. Verify:
 
 ```bash
-wrangler whoami        # from this directory: apps account
-wrangler auth list     # shows the profile and its bound directory
+npx wrangler whoami        # from this directory: apps account
+npx wrangler auth list     # shows the profile and its bound directory
 ```
 
 Then paste the account id from `whoami` into `account_id` in `wrangler.toml`.
@@ -56,7 +63,7 @@ That pin is a guard, not a convenience: it makes a wrong-account session fail
 loudly instead of silently creating a second `muncie-radon` project somewhere
 you will not think to look.
 
-`wrangler auth` is marked experimental in wrangler 4.114. The fallback, if it
+`npx wrangler auth` is marked experimental in wrangler 4.114. The fallback, if it
 misbehaves, is a scoped API token in the environment instead:
 
 ```bash
@@ -80,8 +87,8 @@ Never a dead end.
 ### 2. D1
 
 ```bash
-wrangler d1 create muncie-radon
-wrangler d1 execute muncie-radon --remote --file=./schema.sql
+npx wrangler d1 create muncie-radon
+npx wrangler d1 execute muncie-radon --remote --file=./schema.sql
 ```
 
 Paste the returned id into **both** `database_id` slots in `wrangler.toml`, the
@@ -91,7 +98,7 @@ on every form submit. `npm run audit` warns until both are filled in.
 
 ### 3. Secrets
 
-Set in the Pages dashboard or via `wrangler pages secret put <NAME>`:
+Set in the Pages dashboard or via `npx wrangler pages secret put <NAME>`:
 
 | Name | What it is |
 |---|---|
@@ -118,9 +125,9 @@ analytics.
 Create the project once, then deploy:
 
 ```bash
-wrangler pages project create muncie-radon --production-branch=main
+npx wrangler pages project create muncie-radon --production-branch=main
 npm run build
-wrangler pages deploy dist --project-name=muncie-radon
+npx wrangler pages deploy dist --project-name=muncie-radon
 ```
 
 That is direct upload: no GitHub remote required, and it is the fastest path to
@@ -149,7 +156,7 @@ after indexing starts.
 
 - [ ] Submit a test lead. Confirm the row in D1 **and** the notification email.
   ```bash
-  wrangler d1 execute muncie-radon --remote --command="SELECT ts,name,phone,page,form_id FROM leads ORDER BY id DESC LIMIT 5"
+  npx wrangler d1 execute muncie-radon --remote --command="SELECT ts,name,phone,page,form_id FROM leads ORDER BY id DESC LIMIT 5"
   ```
 - [ ] Place a test call. Confirm the `calls` row, that the forward connects, and
       that the recording announcement plays on the answering leg.
