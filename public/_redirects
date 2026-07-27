@@ -1,0 +1,7 @@
+# Cloudflare Pages redirects. Copied verbatim from public/ into dist/.
+#
+# @astrojs/sitemap emits /sitemap-index.xml and /sitemap-0.xml, never the
+# conventional /sitemap.xml. robots.txt and Search Console both point at the
+# real index, so this exists only to catch anyone (or any tool) that guesses the
+# conventional path instead of reading robots.txt.
+/sitemap.xml  /sitemap-index.xml  301

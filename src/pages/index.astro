@@ -10,8 +10,17 @@ import CtaBand from '../components/CtaBand.astro';
 import Callout from '../components/Callout.astro';
 import { Icon } from 'astro-icon/components';
 
-const title = `Radon Mitigation Muncie IN | Certified Testing & Systems from $1,200`;
-const description = `Delaware County is EPA Zone 1 and the average Muncie home tests right at the action level. Free estimates, honest pricing ($1,200–$2,000), IDOH-certified installers.`;
+// Both of these are length-constrained on purpose. The old title rendered at
+// 623px against Google's ~580px cut, which truncated "from $1,200" away: the
+// price is the differentiator, so losing it to an ellipsis was the expensive
+// part. Dropping "Certified Testing" also settles a house-rule problem, since a
+// title reading "Certified" next to our own brand implies we hold the
+// certification when it belongs to the installer.
+// The description ran 165 chars against a ~155 practical cut. Price is gone from
+// it because the title now carries it, and repeating it inside one SERP result
+// buys nothing.
+const title = `Radon Mitigation Muncie IN | Systems from $1,200`;
+const description = `Delaware County is EPA Zone 1 and the average Muncie home tests at the action level. Free estimates, honest pricing, and IDOH-certified installers.`;
 
 const steps = [
   {
