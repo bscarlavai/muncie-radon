@@ -83,8 +83,19 @@ export const site = {
   /** POST target for the quote form (Cloudflare Pages Function) */
   formEndpoint: '/api/lead',
 
-  /** Cloudflare Web Analytics token. No GA4: GSC is the rank tracker, D1 is conversion analytics. */
-  analyticsToken: '',
+  /**
+   * Cloudflare Web Analytics token. No GA4: GSC is the rank tracker, D1 is
+   * conversion analytics, and gtag would cost the Lighthouse 100 and pull a
+   * cookie banner in behind it.
+   *
+   * Not a secret. It ships in the HTML of every page, which is why it lives in
+   * committed config rather than the secret store, and why it forks with the repo.
+   *
+   * RUM is set to "Enable with JS Snippet installation" in the dashboard, NOT
+   * plain "Enable". Auto-injection plus this token would load two beacons and
+   * double-count every pageview.
+   */
+  analyticsToken: 'fcab4e5cb86d46b294e68a518b90a2d1',
 
   services: [
     {
