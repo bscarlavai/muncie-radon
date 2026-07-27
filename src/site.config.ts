@@ -53,10 +53,10 @@ export const site = {
    * Until provisioned this forwards to Bret's phone (launch-window rule).
    */
   phone: {
-    display: '(765) 555-0100',
-    tel: '+17655550100',
+    display: '(765) 722-2494',
+    tel: '+17657222494',
     /** Flip to true once the real Twilio number is live. Build warns while false. */
-    provisioned: false,
+    provisioned: true,
   },
 
   email: 'quotes@muncieradon.com',
