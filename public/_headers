@@ -1,0 +1,14 @@
+# Cloudflare Pages response headers. Copied verbatim from public/ into dist/.
+#
+# HSTS tells a browser to refuse plaintext HTTP to this host for a year, which
+# closes the gap where the first request to http://muncieradon.com travels in the
+# clear before the 301 upgrades it.
+#
+# Deliberately WITHOUT `preload`. Preloading ships the domain inside browser
+# binaries, and getting removed from that list takes months, so it is not a
+# setting to enable on a site that is one day old. includeSubDomains is safe here
+# because every hostname under this domain is served by Pages over HTTPS.
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

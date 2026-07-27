@@ -61,6 +61,12 @@ const ogImage = new URL('/og-default.png', Astro.site).href;
     <meta name="geo.region" content={`US-${site.stateAbbr}`} />
     <meta name="geo.placename" content={site.city} />
 
+    {/*
+      Both, in this order, on purpose. A browser that understands SVG picks the
+      scalable one; everything else, plus the audit tools and link unfurlers that
+      request /favicon.ico at the root regardless of markup, gets the .ico.
+    */}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />

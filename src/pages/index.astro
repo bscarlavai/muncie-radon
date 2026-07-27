@@ -20,7 +20,11 @@ import { Icon } from 'astro-icon/components';
 // it because the title now carries it, and repeating it inside one SERP result
 // buys nothing.
 const title = `Radon Mitigation Muncie IN | Systems from $1,200`;
-const description = `Delaware County is EPA Zone 1 and the average Muncie home tests at the action level. Free estimates, honest pricing, and IDOH-certified installers.`;
+// Leads with "Radon testing and mitigation" because the previous version named
+// neither. Both terms were in the title and the H2s but missing from the
+// description, so the snippet Google shows carried no bolded query match on the
+// two words people actually type.
+const description = `Radon testing and mitigation in Muncie, IN. Delaware County is EPA Zone 1 and the average home tests at the action level. Free estimates, honest pricing.`;
 
 const steps = [
   {

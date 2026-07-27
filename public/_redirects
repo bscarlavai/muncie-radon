@@ -5,3 +5,4 @@
 # real index, so this exists only to catch anyone (or any tool) that guesses the
 # conventional path instead of reading robots.txt.
 /sitemap.xml  /sitemap-index.xml  301
+

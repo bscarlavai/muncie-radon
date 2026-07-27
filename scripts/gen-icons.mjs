@@ -5,7 +5,7 @@
  *   npm run icons
  */
 import sharp from 'sharp';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const svg = readFileSync('public/favicon.svg');
 
@@ -18,6 +18,37 @@ const targets = [
 for (const { file, size } of targets) {
   await sharp(svg, { density: 384 }).resize(size, size).png().toFile(file);
   console.log(`wrote ${file} (${size}x${size})`);
+}
+
+/* favicon.ico, because /favicon.ico is still fetched by convention: link
+   unfurlers, feed readers, and audit tools request it at the root whether or not
+   the HTML declares one, and a 404 there reads as "no favicon" even when a
+   perfectly good SVG is linked.
+
+   sharp cannot write ICO, but the format has allowed PNG-encoded entries since
+   Vista, so a 22-byte header in front of a 32x32 PNG is a valid single-image
+   .ico that every current browser accepts. Layout: 6-byte ICONDIR, then one
+   16-byte ICONDIRENTRY, then the PNG payload at offset 22. */
+{
+  const png = await sharp(svg, { density: 384 }).resize(32, 32).png().toBuffer();
+
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // type 1 = icon
+  header.writeUInt16LE(1, 4); // one image
+
+  const entry = Buffer.alloc(16);
+  entry.writeUInt8(32, 0); // width
+  entry.writeUInt8(32, 1); // height
+  entry.writeUInt8(0, 2); // palette size, 0 for truecolor
+  entry.writeUInt8(0, 3); // reserved
+  entry.writeUInt16LE(1, 4); // colour planes
+  entry.writeUInt16LE(32, 6); // bits per pixel
+  entry.writeUInt32LE(png.length, 8);
+  entry.writeUInt32LE(22, 12); // payload offset: 6 + 16
+
+  writeFileSync('public/favicon.ico', Buffer.concat([header, entry, png]));
+  console.log(`wrote public/favicon.ico (32x32, ${png.length + 22} bytes)`);
 }
 
 /* Open Graph card: the mark on brand navy with the wordmark beside it.
