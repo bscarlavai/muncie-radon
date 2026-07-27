@@ -207,8 +207,30 @@ after indexing starts.
 
 Checked against the built output in `dist/`, not assumed:
 
-- **Lighthouse mobile: 100 / 100 / 100 / 100** (performance, accessibility,
-  best practices, SEO) on home, radon-mitigation, real-estate-radon, and contact.
+- **Lighthouse mobile: 100 accessibility, 100 best practices, 100 SEO** on every
+  page measured. Performance is 100 on home and contact, and **99 on
+  radon-mitigation** once Cloudflare Web Analytics is enabled.
+
+  That 99 is measured, not assumed. Same page, same deployment, beacon the only
+  variable:
+
+  | | Performance | LCP |
+  |---|---|---|
+  | Without beacon | 100, 100 | 1.0s, 1.4s |
+  | With beacon | 99, 99, 99 | 1.9s, 1.9s, 2.0s |
+
+  TBT stays at 0, so the deferred beacon is not blocking the main thread. The
+  cost is a third-party DNS lookup plus TLS handshake to
+  `static.cloudflareinsights.com` competing for bandwidth on Lighthouse's
+  throttled mobile profile. Only the longest page has too little headroom to
+  absorb it.
+
+  Kept deliberately. LCP at 1.9s is well inside the 2.5s "good" Core Web Vitals
+  threshold, and Google ranks on field data against those thresholds rather than
+  on the lab score. Trading away referrer and pageview data to recover a cosmetic
+  point is the wrong call for a site whose product is measurable lead flow. To
+  reverse it, blank `analyticsToken` in `site.config.ts`; nothing else references
+  the beacon.
 - **50 JSON-LD blocks, 0 invalid.** 18 WebSite, 18 Organization, 15 BreadcrumbList,
   11 FAQPage, 6 Service.
 - **1,156 internal links, 0 broken.**
