@@ -121,7 +121,14 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const whisperUrl = `${origin}/api/twilio-whisper`;
 
   return twiml(
-    `<Dial timeout="25" callerId="${escapeXml(params.To ?? '')}" record="record-from-answer-dual" recordingStatusCallback="${escapeXml(recordingCb)}" answerOnBridge="true">` +
+    // timeout is 18 rather than something more generous on purpose. FORWARD_TO is
+    // a mobile, and a carrier voicemail box typically answers around 20 to 30
+    // seconds. If it wins that race Twilio counts the call as answered and
+    // bridges it, so a radon lead hears a personal voicemail greeting and we log
+    // nothing useful. Losing the race to our own <Record> below is strictly
+    // better: the greeting is written for this business and the recording lands
+    // in D1. Cost is roughly two fewer rings to reach the phone.
+    `<Dial timeout="18" callerId="${escapeXml(params.To ?? '')}" record="record-from-answer-dual" recordingStatusCallback="${escapeXml(recordingCb)}" answerOnBridge="true">` +
       `<Number url="${escapeXml(whisperUrl)}">${escapeXml(env.FORWARD_TO)}</Number>` +
       `</Dial>` +
       `<Say>Sorry we missed you. Please leave a message after the tone and we will call you back.</Say>` +
