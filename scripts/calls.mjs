@@ -22,14 +22,46 @@ const playIdx = args.indexOf('play');
 const playId = playIdx !== -1 ? args[playIdx + 1] : null;
 const limit = Number(args.find((a) => /^\d+$/.test(a))) || 15;
 
-function d1(sql) {
-  const out = execFileSync(
-    'npx',
-    ['wrangler', 'd1', 'execute', 'muncie-radon', '--remote', '-y', '--json', '--command', sql],
-    { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
-  );
+// Cloudflare's D1 query endpoint intermittently returns 7403 ("account is not
+// authorized") on a token that is in fact authorized, and the retry succeeds.
+// Retry once, and on a real failure print Cloudflare's own message instead of a
+// Node stack trace, so the reader can tell a flake from an expired login.
+function d1(sql, attempt = 1) {
+  let out;
+  try {
+    out = execFileSync(
+      'npx',
+      ['wrangler', 'd1', 'execute', 'muncie-radon', '--remote', '-y', '--json', '--command', sql],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+  } catch (err) {
+    const body = String(err.stdout ?? '') + String(err.stderr ?? '');
+    if (attempt < 2) {
+      console.error('D1 query failed, retrying...');
+      sleep(2);
+      return d1(sql, attempt + 1);
+    }
+    // wrangler nests the useful sentence in error.notes[].text, not error.text,
+    // so collect every "text" it printed rather than picking one.
+    const notes = [...body.matchAll(/"text":\s*"((?:[^"\\]|\\.)*)"/g)].map((m) =>
+      m[1].replace(/\\n/g, ' ').replace(/\\"/g, '"'),
+    );
+    console.error(
+      `D1 query failed twice.\n` +
+        (notes.length ? notes.map((n) => `  ${n}`).join('\n') : `  ${body.trim() || err.message}`) +
+        '\n\nIf that mentions authorization, check `npx wrangler whoami` reports the\n' +
+        'lavailabs profile. Run it from this directory: the profile is bound to it.',
+    );
+    process.exit(1);
+  }
   // wrangler prints a banner before the JSON, so seek to the array.
   return JSON.parse(out.slice(out.indexOf('[')))[0].results;
+}
+
+// Synchronous, because everything here is synchronous and a two-second pause is
+// not worth restructuring the script around a promise.
+function sleep(seconds) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, seconds * 1000);
 }
 
 const local = (iso) =>
