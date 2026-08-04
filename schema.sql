@@ -32,19 +32,27 @@ CREATE INDEX IF NOT EXISTS idx_leads_status  ON leads (status);
 CREATE INDEX IF NOT EXISTS idx_leads_page    ON leads (page);
 
 
+-- status, talk_sec and recording_kind are what turn a call count into an answer
+-- rate. duration_sec and talk_sec are NOT the same number and the difference is
+-- the whole point: duration_sec is how long the audio file is, so a voicemail
+-- has one too, while talk_sec is how long two humans were connected. A row with
+-- duration_sec set and talk_sec null is a missed call.
 CREATE TABLE IF NOT EXISTS calls (
-  id            INTEGER PRIMARY KEY AUTOINCREMENT,
-  ts            TEXT    NOT NULL,
-  call_sid      TEXT    UNIQUE,           -- Twilio CallSid, dedupes retried webhooks
-  from_number   TEXT,
-  to_number     TEXT,
-  direction     TEXT,
-  status        TEXT,                     -- completed | no-answer | busy | failed
-  duration_sec  INTEGER,
-  recording_url TEXT,
-  from_city     TEXT,
-  from_state    TEXT,
-  notes         TEXT
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts             TEXT    NOT NULL,
+  call_sid       TEXT    UNIQUE,          -- Twilio CallSid, dedupes retried webhooks
+  from_number    TEXT,
+  to_number      TEXT,
+  direction      TEXT,
+  status         TEXT,                    -- ringing until the dial ends, then
+                                          -- completed | no-answer | busy | failed | canceled
+  duration_sec   INTEGER,                 -- length of the recording, if any
+  talk_sec       INTEGER,                 -- seconds actually connected, null if never answered
+  recording_url  TEXT,
+  recording_kind TEXT,                    -- call | voicemail
+  from_city      TEXT,
+  from_state     TEXT,
+  notes          TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_calls_ts   ON calls (ts DESC);

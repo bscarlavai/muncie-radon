@@ -15,7 +15,8 @@
     "audit": "node scripts/audit.mjs",
     "deploy": "node scripts/check-account.mjs && npm run build && wrangler pages deploy dist --project-name=muncie-radon",
     "icons": "node scripts/gen-icons.mjs",
-    "calls": "node scripts/calls.mjs"
+    "calls": "node scripts/calls.mjs",
+    "check:webhooks": "node scripts/check-webhooks.mjs"
   },
   "keywords": [],
   "author": "",

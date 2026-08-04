@@ -10,6 +10,8 @@
  * interstate calls where the other end may be a two-party-consent state.
  */
 
+import { escapeXml, twiml } from '../../lib/twilio';
+
 interface Env {
   BRAND?: string;
 }
@@ -17,11 +19,5 @@ interface Env {
 export const onRequestPost: PagesFunction<Env> = async ({ env }) => {
   const brand = env.BRAND ?? 'Muncie Radon';
 
-  return new Response(
-    `<?xml version="1.0" encoding="UTF-8"?>` +
-      `<Response>` +
-      `<Say voice="Polly.Joanna">New ${brand} lead. This call is recorded.</Say>` +
-      `</Response>`,
-    { headers: { 'content-type': 'text/xml; charset=utf-8', 'cache-control': 'no-store' } },
-  );
+  return twiml(`<Say voice="Polly.Joanna">New ${escapeXml(brand)} lead. This call is recorded.</Say>`);
 };

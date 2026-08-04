@@ -20,11 +20,20 @@ function walk(dir) {
 }
 
 const files = walk(SRC);
+
+// The em dash rule says "anywhere", so it gets the whole hand-written surface,
+// not just src/. The phone rule below stays on src/ because it is about what
+// renders to a visitor. Directories are listed rather than walked from the repo
+// root to keep dist/ and generated output out of it.
+const allSource = ['functions', 'lib', 'scripts'].flatMap((dir) => walk(dir)).concat(files);
+
 const errors = [];
 const warnings = [];
 
 /* ---- 1. No em dashes. House style. ---------------------------------------- */
-for (const file of files) {
+for (const file of allSource) {
+  // This file has to contain the character in order to search for it.
+  if (file === join('scripts', 'audit.mjs')) continue;
   readFileSync(file, 'utf8')
     .split('\n')
     .forEach((line, i) => {
@@ -109,7 +118,7 @@ for (const w of warnings) console.warn(`\x1b[33mwarn\x1b[0m  ${w}`);
 for (const e of errors) console.error(`\x1b[31mfail\x1b[0m  ${e}`);
 
 console.log(
-  `\naudit: ${files.length} files checked, ${errors.length} error(s), ${warnings.length} warning(s)`,
+  `\naudit: ${allSource.length} files checked, ${errors.length} error(s), ${warnings.length} warning(s)`,
 );
 
 if (errors.length) process.exit(1);

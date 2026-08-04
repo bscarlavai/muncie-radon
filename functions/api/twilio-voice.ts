@@ -10,86 +10,34 @@
  * says hello, while the party being recorded still gets notice. Indiana is a
  * one-party-consent state; the announcement covers interstate calls where the
  * other end may be two-party.
+ *
+ * What happens after the dial lives in /api/twilio-dial-status, not here. See
+ * that file for why.
  */
+import { escapeXml, readParams, rejectIfUnsigned, twiml, type TwilioEnv } from '../../lib/twilio';
 
-interface Env {
-  DB: D1Database;
+interface Env extends TwilioEnv {
   /** E.164 destination the tracking number rings through to. */
   FORWARD_TO: string;
-  /** Twilio auth token, used to verify the request signature. */
-  TWILIO_AUTH_TOKEN?: string;
-}
-
-function twiml(body: string): Response {
-  return new Response(`<?xml version="1.0" encoding="UTF-8"?><Response>${body}</Response>`, {
-    headers: { 'content-type': 'text/xml; charset=utf-8', 'cache-control': 'no-store' },
-  });
-}
-
-const escapeXml = (value: string) =>
-  value.replace(/[<>&'"]/g, (c) =>
-    ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[c]!,
-  );
-
-/**
- * Twilio signs every webhook. Without this check anyone who finds the URL can
- * write junk into the calls table, which is the one dataset the renter pitch
- * depends on being clean.
- */
-async function isValidSignature(
-  url: string,
-  params: Record<string, string>,
-  signature: string,
-  authToken: string,
-): Promise<boolean> {
-  const payload =
-    url +
-    Object.keys(params)
-      .sort()
-      .map((key) => key + params[key])
-      .join('');
-
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(authToken),
-    { name: 'HMAC', hash: 'SHA-1' },
-    false,
-    ['sign'],
-  );
-  const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload));
-  const expected = btoa(String.fromCharCode(...new Uint8Array(mac)));
-
-  // Constant-time-ish compare.
-  if (expected.length !== signature.length) return false;
-  let diff = 0;
-  for (let i = 0; i < expected.length; i++) {
-    diff |= expected.charCodeAt(i) ^ signature.charCodeAt(i);
-  }
-  return diff === 0;
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
-  const form = await request.formData();
-  const params: Record<string, string> = {};
-  for (const [key, value] of form.entries()) {
-    if (typeof value === 'string') params[key] = value;
-  }
+  const params = await readParams(request);
 
-  if (env.TWILIO_AUTH_TOKEN) {
-    const signature = request.headers.get('x-twilio-signature') ?? '';
-    const valid = await isValidSignature(request.url, params, signature, env.TWILIO_AUTH_TOKEN);
-    if (!valid) {
-      console.warn('twilio-voice: rejected unsigned or mis-signed request');
-      return new Response('Forbidden', { status: 403 });
-    }
-  }
+  const rejected = await rejectIfUnsigned(request, params, env.TWILIO_AUTH_TOKEN, 'twilio-voice');
+  if (rejected) return rejected;
 
   // Log first, forward second. A logging failure must not drop the call.
   try {
     await env.DB.prepare(
       `INSERT INTO calls (ts, call_sid, from_number, to_number, direction, status, from_city, from_state)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT (call_sid) DO UPDATE SET status = excluded.status`,
+       ON CONFLICT (call_sid) DO UPDATE SET
+         status = CASE
+           WHEN calls.status IS NULL OR calls.status IN ('queued', 'ringing', 'in-progress')
+             THEN excluded.status
+           ELSE calls.status
+         END`,
     )
       .bind(
         new Date().toISOString(),
@@ -119,19 +67,23 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const origin = new URL(request.url).origin;
   const recordingCb = `${origin}/api/twilio-recording`;
   const whisperUrl = `${origin}/api/twilio-whisper`;
+  const dialStatusCb = `${origin}/api/twilio-dial-status`;
 
   return twiml(
     // timeout is 18 rather than something more generous on purpose. FORWARD_TO is
     // a mobile, and a carrier voicemail box typically answers around 20 to 30
     // seconds. If it wins that race Twilio counts the call as answered and
     // bridges it, so a radon lead hears a personal voicemail greeting and we log
-    // nothing useful. Losing the race to our own <Record> below is strictly
-    // better: the greeting is written for this business and the recording lands
-    // in D1. Cost is roughly two fewer rings to reach the phone.
-    `<Dial timeout="18" callerId="${escapeXml(params.To ?? '')}" record="record-from-answer-dual" recordingStatusCallback="${escapeXml(recordingCb)}" answerOnBridge="true">` +
+    // nothing useful. Losing the race to our own <Record> is strictly better:
+    // the greeting is written for this business and the recording lands in D1.
+    // Cost is roughly two fewer rings to reach the phone.
+    //
+    // action hands control to twilio-dial-status when the dial ends. Nothing may
+    // follow this verb: Twilio documents everything after a <Dial action> as
+    // unreachable, so a <Say> parked here would look like a working fallback
+    // while never once playing.
+    `<Dial timeout="18" callerId="${escapeXml(params.To ?? '')}" record="record-from-answer-dual" recordingStatusCallback="${escapeXml(recordingCb)}" action="${escapeXml(dialStatusCb)}" answerOnBridge="true">` +
       `<Number url="${escapeXml(whisperUrl)}">${escapeXml(env.FORWARD_TO)}</Number>` +
-      `</Dial>` +
-      `<Say>Sorry we missed you. Please leave a message after the tone and we will call you back.</Say>` +
-      `<Record maxLength="120" transcribe="false" recordingStatusCallback="${escapeXml(recordingCb)}"/>`,
+      `</Dial>`,
   );
 };

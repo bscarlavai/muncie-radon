@@ -102,7 +102,8 @@ if (playId) {
 }
 
 const calls = d1(
-  `SELECT id, ts, from_number, from_city, from_state, status, duration_sec, recording_url
+  `SELECT id, ts, from_number, from_city, from_state, status, duration_sec, talk_sec,
+          recording_kind, recording_url
    FROM calls ORDER BY id DESC LIMIT ${limit}`,
 );
 
@@ -111,18 +112,48 @@ if (!calls.length) {
   process.exit(0);
 }
 
+const mmss = (s) => `${Math.floor(s / 60)}m${String(s % 60).padStart(2, '0')}s`;
+
+/**
+ * Three states, not two. "answered" and "missed" come from the dial status;
+ * "unknown" is a call that predates the dial-status handler, and calling those
+ * missed would invent data. Answer rate below counts only what is known.
+ */
+function outcome(c) {
+  if (c.talk_sec > 0) return { label: 'answered', detail: mmss(c.talk_sec), known: true };
+  if (c.recording_kind === 'voicemail') return { label: 'voicemail', detail: '', known: true };
+  if (['no-answer', 'busy', 'failed', 'canceled'].includes(c.status)) {
+    return { label: 'missed', detail: c.status, known: true };
+  }
+  return { label: 'unknown', detail: '', known: false };
+}
+
 console.log('');
 for (const c of calls) {
   const where = [c.from_city, c.from_state].filter(Boolean).join(', ') || 'unknown';
-  const dur = c.duration_sec ? `${c.duration_sec}s` : '--';
+  const o = outcome(c);
+  const rec = c.recording_url ? `play: npm run calls -- play ${c.id}` : 'no recording';
   console.log(
-    `#${String(c.id).padEnd(3)} ${local(c.ts).padEnd(18)} ${(c.from_number ?? '?').padEnd(14)} ${where.padEnd(22)} ${dur.padEnd(6)} ${c.recording_url ? `play: npm run calls -- play ${c.id}` : 'no recording'}`,
+    `#${String(c.id).padEnd(3)} ${local(c.ts).padEnd(18)} ${(c.from_number ?? '?').padEnd(14)} ` +
+      `${where.padEnd(22)} ${o.label.padEnd(10)} ${o.detail.padEnd(8)} ${rec}`,
   );
 }
 
-// status is logged when Twilio first rings the Function, so it reads "ringing"
-// even on calls that completed. Say so rather than presenting it as truth.
-console.log(
-  `\n${calls.length} call(s). Duration is the RECORDING length, and an answered call and a` +
-    `\nvoicemail both produce one, so this does not yet distinguish answered from missed.`,
-);
+const known = calls.filter((c) => outcome(c).known);
+const answered = calls.filter((c) => c.talk_sec > 0);
+const talk = answered.reduce((sum, c) => sum + c.talk_sec, 0);
+
+console.log(`\n${calls.length} call(s).`);
+if (known.length) {
+  const rate = Math.round((answered.length / known.length) * 100);
+  console.log(
+    `${answered.length} of ${known.length} known answered (${rate}%)` +
+      (answered.length ? `, average talk time ${mmss(Math.round(talk / answered.length))}` : ''),
+  );
+}
+if (known.length < calls.length) {
+  console.log(
+    `${calls.length - known.length} call(s) predate the dial-status handler and have no` +
+      `\noutcome recorded. They are excluded from the rate rather than assumed missed.`,
+  );
+}
